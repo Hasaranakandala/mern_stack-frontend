@@ -1,0 +1,99 @@
+/* Card Container */
+.productCard {
+  width: 280px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin: 16px;
+}
+
+/* Hover Effect for Card */
+.productCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Image Style */
+.productImage {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+/* Product Title */
+.productCard h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 8px 0;
+  text-transform: capitalize;
+  text-align: center;
+}
+
+/* Product Description */
+.productCard p {
+  font-size: 0.875rem;
+  color: #666666;
+  text-align: center;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+/* Price */
+.productCard h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2b8a3e;
+  margin-bottom: 16px;
+}
+
+/* Buttons */
+.productCard button {
+  width: 100%;
+  padding: 10px 0;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  margin-bottom: 8px;
+}
+
+.productCard button:active {
+  transform: scale(0.98);
+}
+
+/* Add to Cart Button */
+.addToCart {
+  background-color: #e7f5ff;
+  color: #1c7ed6;
+}
+
+.addToCart:hover {
+  background-color: #d0ebff;
+}
+
+/* Buy Now Button */
+.buyNow {
+  background-color: #1c7ed6;
+  color: #ffffff;
+}
+
+.buyNow:hover {
+  background-color: #1971c2;
+}
+.full{
+  display:flex
+;
+flex-direction:row;
+
+}
