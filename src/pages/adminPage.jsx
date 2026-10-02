@@ -1,64 +1,172 @@
-import { Link, useLocation } from "react-router-dom";
-import { Routes, Route } from "react-router-dom";
-import {useState} from "react";
-import {toast } from "react-hot-toast"
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  Routes,
+  Route,
+} from "react-router-dom";
 
-import axios from "axios";
-
+import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
 import AdminProductPage from "./admin/adminProductPage";
 import AddProductPage from "./admin/addProductPage";
 import EditProductPage from "./admin/productPageEdit";
 import AdminOrderPage from "./admin/adminOrderPage";
-import { useEffect } from "react";
 import Loading from "../components/loading";
+
 
 export default function AdminPage() {
 
   const location = useLocation();
+  const navigate = useNavigate();
+
   const path = location.pathname;
-  const [status,setStatus]=useState("loading");
 
-  useEffect(()=>{
-    const token=localStorage.getItem("token");
-    if(!token){
-      setStatus("unauthenticated");
-      window.location.href="/login";
+  const [status, setStatus] = useState("loading");
 
+
+  // ============================================
+  // DECODE JWT TOKEN
+  // ============================================
+
+  function decodeToken(token) {
+    try {
+      const payload = token.split(".")[1];
+
+      const decodedPayload = atob(
+        payload.replace(/-/g, "+").replace(/_/g, "/")
+      );
+
+      return JSON.parse(decodedPayload);
+
+    } catch (error) {
+      console.error("Token decode error:", error);
+      return null;
     }
-    else{
-
-      axios.get(import.meta.env.VITE_BACKEND_URL+"/api/user",{
-        headers:{
-          Authorization:`Bearer ${token}`
-        }
-      }).then((res)=>{
-        if(res.data.role!=="admin"){
-          setStatus("unauthorized");
-          toast.error("you are not authorized to access this page");
-          
-          window.location.href="/";
-
-        }else{
-          setStatus("authenticated");
+  }
 
 
-        }
-      }).catch((err)=>{
+  // ============================================
+  // CHECK ADMIN
+  // ============================================
+
+  useEffect(() => {
+
+    const checkAdmin = () => {
+
+      const token = localStorage.getItem("token");
+
+
+      // ========================================
+      // NO TOKEN
+      // ========================================
+
+      if (!token) {
+
         setStatus("unauthenticated");
-        toast.error("you are not authorized to access this page,please login first");
 
-        window.location.href="/login";
-        console.error(err);
+        toast.error("Please login first");
+
+        navigate("/login", {
+          replace: true,
+        });
+
+        return;
+      }
 
 
-      })
-      
+      // ========================================
+      // DECODE TOKEN
+      // ========================================
 
-    }
+      const decodedUser = decodeToken(token);
+
+      console.log("Decoded user:", decodedUser);
 
 
-  },[status])
+      // Invalid token
+      if (!decodedUser) {
+
+        localStorage.removeItem("token");
+
+        setStatus("unauthenticated");
+
+        toast.error(
+          "Invalid login session. Please login again."
+        );
+
+        navigate("/login", {
+          replace: true,
+        });
+
+        return;
+      }
+
+
+      // ========================================
+      // CHECK TOKEN EXPIRATION
+      // ========================================
+
+      if (
+        decodedUser.exp &&
+        decodedUser.exp * 1000 < Date.now()
+      ) {
+
+        localStorage.removeItem("token");
+
+        setStatus("unauthenticated");
+
+        toast.error(
+          "Your session has expired. Please login again."
+        );
+
+        navigate("/login", {
+          replace: true,
+        });
+
+        return;
+      }
+
+
+      // ========================================
+      // CHECK ADMIN ROLE
+      // ========================================
+
+      if (decodedUser.role !== "admin") {
+
+        setStatus("unauthorized");
+
+        toast.error(
+          "You are not authorized to access this page"
+        );
+
+        navigate("/", {
+          replace: true,
+        });
+
+        return;
+      }
+
+
+      // ========================================
+      // ADMIN AUTHENTICATED
+      // ========================================
+
+      console.log("Admin authenticated successfully");
+
+      setStatus("authenticated");
+    };
+
+
+    checkAdmin();
+
+  }, [navigate]);
+
+
+  // ============================================
+  // SIDEBAR ACTIVE CLASS
+  // ============================================
 
   function getClass(name) {
 
@@ -67,42 +175,66 @@ export default function AdminPage() {
       "flex items-center cursor-pointer ";
 
     if (path.includes(name)) {
+
       return (
         baseClass +
         "bg-accent text-white shadow-md"
       );
-    } else {
-      return (
-        baseClass +
-        "text-accent hover:bg-gray-100 hover:translate-x-1"
-      );
+
     }
+
+    return (
+      baseClass +
+      "text-accent hover:bg-gray-100 hover:translate-x-1"
+    );
   }
+
+
+  // ============================================
+  // LOADING
+  // ============================================
+
+  if (status === "loading") {
+    return <Loading />;
+  }
+
+
+  // ============================================
+  // DON'T SHOW ADMIN PANEL TO NON-ADMIN
+  // ============================================
+
+  if (status !== "authenticated") {
+    return <Loading />;
+  }
+
+
+  // ============================================
+  // ADMIN PANEL
+  // ============================================
 
   return (
 
     <div className="w-full h-screen flex bg-[#FBFBFB]">
 
+
       {/* ================= SIDEBAR ================= */}
-{status == "loading"  || status == "unauthenticated" ? <Loading/> : (
-      <>
 
       <div
         className="
-        h-full
-        w-[300px]
-        bg-white
-        border-r
-        border-gray-200
-        shadow-sm
-        flex
-        flex-col
-        px-5
-        py-8
+          h-full
+          w-[300px]
+          bg-white
+          border-r
+          border-gray-200
+          shadow-sm
+          flex
+          flex-col
+          px-5
+          py-8
         "
       >
 
-        {/* Admin Title */}
+        {/* ADMIN TITLE */}
 
         <div className="mb-10 px-2">
 
@@ -117,9 +249,10 @@ export default function AdminPage() {
         </div>
 
 
-        {/* Navigation Links */}
+        {/* NAVIGATION LINKS */}
 
         <div className="flex flex-col gap-3 text-base font-semibold">
+
 
           <Link
             to="/admin/products"
@@ -152,6 +285,7 @@ export default function AdminPage() {
             Reviews
           </Link>
 
+
         </div>
 
       </div>
@@ -159,40 +293,65 @@ export default function AdminPage() {
 
       {/* ================= PAGE CONTENT ================= */}
 
-      <div className="h-full flex-1 overflow-y-auto bg-[#F8F9FA]">
+      <div
+        className="
+          h-full
+          flex-1
+          overflow-y-auto
+          bg-[#F8F9FA]
+        "
+      >
 
         <Routes>
 
+
           <Route
-            path="/products"
+            path="products"
             element={<AdminProductPage />}
           />
 
-          <Route
-            path="/orders"
-            element={<AdminOrderPage/>}
-          />
-
-           <Route
-            path="/users"
-            element={<><h1>users</h1></>}
-          />
 
           <Route
-            path="/add-product"
+            path="orders"
+            element={<AdminOrderPage />}
+          />
+
+
+          <Route
+            path="users"
+            element={
+              <h1 className="p-10 text-2xl font-bold">
+                Users
+              </h1>
+            }
+          />
+
+
+          <Route
+            path="add-product"
             element={<AddProductPage />}
           />
 
+
           <Route
-            path="/edit-product"
+            path="edit-product"
             element={<EditProductPage />}
           />
+
+
+          <Route
+            path="reviews"
+            element={
+              <h1 className="p-10 text-2xl font-bold">
+                Reviews
+              </h1>
+            }
+          />
+
 
         </Routes>
 
       </div>
-    </>)
-}
 
     </div>
   );
