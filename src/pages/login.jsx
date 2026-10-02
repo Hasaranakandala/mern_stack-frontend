@@ -2,12 +2,14 @@ import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { FaGoogle } from "react-icons/fa";
 import {
   FiMail,
   FiLock,
   FiEye,
   FiEyeOff,
 } from "react-icons/fi";
+import { useGoogleLogin } from "@react-oauth/google";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -18,6 +20,44 @@ export default function LoginPage() {
 
   const navigate = useNavigate();
 
+
+  // adding google through  login
+const googleLogin = useGoogleLogin({
+  onSuccess: async (response) => {
+    try {
+      const accessToken = response.access_token;
+
+      const result = await axios.post(
+        import.meta.env.VITE_BACKEND_URL + "/api/user/login/google",
+        {
+          accessToken: accessToken
+        }
+      );
+
+    toast.success("login successfully !");
+      const token =result.data.token
+      localStorage.setItem("token",token)
+      if(result.data.role=="admin"){
+        navigate("/admin/");
+
+      }
+      else{
+        navigate("/");
+
+      }
+
+    } catch (error) {
+      console.log(
+        "Google login error:",
+        error.response?.data || error.message
+      );
+    }
+  },
+
+  onError: () => {
+    console.log("Google Login Failed");
+  }
+});
   async function handleLogin(e) {
     e.preventDefault();
 
@@ -65,6 +105,7 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   }
+
 
   return (
     <main
@@ -528,6 +569,49 @@ export default function LoginPage() {
                 "Login"
               )}
             </button>
+            <button
+  type="button"
+  className="
+    w-full
+    min-h-[52px]
+    mt-3
+
+    rounded-xl
+
+    bg-white
+    text-gray-700
+
+    font-semibold
+    text-base
+
+    border
+    border-gray-300
+
+    flex
+    items-center
+    justify-center
+    gap-3
+
+    shadow-sm
+
+    transition-all
+    duration-200
+
+    hover:bg-gray-50
+    hover:border-gray-400
+    hover:shadow-md
+
+    active:scale-[0.98]
+
+    focus:outline-none
+    focus-visible:ring-4
+    focus-visible:ring-gray-200
+  "
+  onClick={googleLogin}
+>
+  <FaGoogle className="text-xl" />
+  Continue with Google
+</button>
           </form>
 
           {/* ================= SIGN UP ================= */}
@@ -584,3 +668,4 @@ export default function LoginPage() {
     </main>
   );
 }
+

@@ -3,6 +3,8 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { BsCart3 } from "react-icons/bs";
 import { HiMenu, HiX } from "react-icons/hi";
 
+
+
 export default function Header() {
   const navigate = useNavigate();
 
@@ -33,17 +35,12 @@ export default function Header() {
         top-0
         left-0
         right-0
-
         z-50
-
         w-full
-
         bg-white/95
         backdrop-blur-md
-
         border-b
         border-gray-100
-
         shadow-[0_2px_18px_rgba(0,0,0,0.05)]
       "
     >
@@ -52,18 +49,14 @@ export default function Header() {
         className="
           max-w-[1440px]
           mx-auto
-
           h-[72px]
           md:h-[80px]
-
           px-4
           sm:px-6
           lg:px-8
-
           flex
           items-center
           justify-between
-
           gap-3
         "
       >
@@ -76,11 +69,8 @@ export default function Header() {
             flex
             items-center
             gap-3
-
             shrink-0
-
             rounded-xl
-
             focus:outline-none
             focus-visible:ring-2
             focus-visible:ring-red-400
@@ -93,25 +83,17 @@ export default function Header() {
             className="
               w-[44px]
               h-[44px]
-
               sm:w-[48px]
               sm:h-[48px]
-
               lg:w-[52px]
               lg:h-[52px]
-
               object-cover
-
               rounded-full
-
               border
               border-gray-100
-
               shadow-sm
-
               transition-all
               duration-300
-
               hover:scale-105
               hover:shadow-md
             "
@@ -126,11 +108,8 @@ export default function Header() {
               className="
                 text-base
                 lg:text-lg
-
                 font-bold
-
                 text-[#393E46]
-
                 leading-tight
               "
             >
@@ -149,16 +128,12 @@ export default function Header() {
           className="
             hidden
             md:flex
-
             flex-1
-
             items-center
             justify-center
-
             gap-1
             lg:gap-2
             xl:gap-3
-
             mx-3
             lg:mx-6
           "
@@ -169,6 +144,11 @@ export default function Header() {
 
           <NavLink to="/products" className={navLinkClass}>
             Products
+          </NavLink>
+
+          {/* SEARCH LINK */}
+          <NavLink to="/search" className={navLinkClass}>
+            Search
           </NavLink>
 
           <NavLink to="/about" className={navLinkClass}>
@@ -187,31 +167,21 @@ export default function Header() {
             to="/signup"
             className="
               ml-1
-
               px-4
               lg:px-5
-
               py-2.5
-
               rounded-xl
-
               bg-red-500
               text-white
-
               text-sm
               font-semibold
-
               shadow-sm
-
               transition-all
               duration-200
-
               hover:bg-red-600
               hover:shadow-md
               hover:-translate-y-[1px]
-
               active:scale-[0.98]
-
               focus:outline-none
               focus-visible:ring-2
               focus-visible:ring-red-400
@@ -227,10 +197,8 @@ export default function Header() {
           className="
             flex
             items-center
-
             gap-2
             sm:gap-3
-
             shrink-0
           "
         >
@@ -240,36 +208,25 @@ export default function Header() {
             aria-label="Open shopping cart"
             className="
               relative
-
               w-[42px]
               h-[42px]
-
               md:w-[44px]
               md:h-[44px]
-
               flex
               items-center
               justify-center
-
               rounded-xl
-
               bg-gray-50
-
               border
               border-gray-100
-
               text-gray-700
-
               transition-all
               duration-200
-
               hover:bg-red-50
               hover:text-red-500
               hover:border-red-100
               hover:shadow-sm
-
               active:scale-95
-
               focus:outline-none
               focus-visible:ring-2
               focus-visible:ring-red-400
@@ -287,23 +244,16 @@ export default function Header() {
                 absolute
                 -top-1.5
                 -right-1.5
-
                 min-w-[20px]
                 h-[20px]
-
                 px-1
-
                 flex
                 items-center
                 justify-center
-
                 rounded-full
-
                 bg-red-500
-
                 border-2
                 border-white
-
                 text-white
                 text-[10px]
                 font-bold
@@ -326,32 +276,22 @@ export default function Header() {
             aria-controls="mobile-navigation"
             className="
               md:hidden
-
               w-[42px]
               h-[42px]
-
               flex
               items-center
               justify-center
-
               rounded-xl
-
               bg-gray-50
-
               border
               border-gray-100
-
               text-gray-700
-
               transition-all
               duration-200
-
               hover:bg-red-50
               hover:text-red-500
               hover:border-red-100
-
               active:scale-95
-
               focus:outline-none
               focus-visible:ring-2
               focus-visible:ring-red-400
@@ -378,14 +318,10 @@ export default function Header() {
         id="mobile-navigation"
         className={`
           md:hidden
-
           overflow-hidden
-
           bg-white
-
           border-t
           border-gray-100
-
           transition-all
           duration-300
           ease-in-out
@@ -402,12 +338,9 @@ export default function Header() {
           className="
             px-4
             sm:px-6
-
             py-4
-
             flex
             flex-col
-
             gap-1
           "
         >
@@ -425,6 +358,15 @@ export default function Header() {
             className={navLinkClass}
           >
             Products
+          </NavLink>
+
+          {/* MOBILE SEARCH */}
+          <NavLink
+            to="/search"
+            onClick={closeMenu}
+            className={navLinkClass}
+          >
+            Search
           </NavLink>
 
           <NavLink
@@ -456,30 +398,19 @@ export default function Header() {
             onClick={closeMenu}
             className="
               mt-2
-
               w-full
-
               text-center
-
               px-4
               py-3
-
               rounded-xl
-
               bg-red-500
               text-white
-
               font-semibold
-
               shadow-sm
-
               transition-all
               duration-200
-
               hover:bg-red-600
-
               active:scale-[0.98]
-
               focus:outline-none
               focus-visible:ring-2
               focus-visible:ring-red-400

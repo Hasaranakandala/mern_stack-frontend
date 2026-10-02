@@ -1,4 +1,6 @@
 import "./App.css";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 
 import {
   BrowserRouter,
@@ -14,9 +16,14 @@ import LoginPage from "./pages/login";
 import AdminPage from "./pages/adminPage";
 import TestPage from "./pages/test";
 import RegisterPage from "./pages/rejister";
+import ForgetPassword from "./pages/forgetPassword"
+
+
 
 function App() {
   return (
+
+    <GoogleOAuthProvider clientId="324294888464-cod1o28ki9ckfubr2l70v2qsa0jqia5s.apps.googleusercontent.com">
     <BrowserRouter>
 
       <Toaster>
@@ -39,6 +46,9 @@ function App() {
           path="/login"
           element={<LoginPage />}
         />
+        <Route path="/forget" element={
+          <ForgetPassword/>
+        }/>
 
         <Route
           path="/rejister"
@@ -68,6 +78,7 @@ function App() {
       </Routes>
 
     </BrowserRouter>
+    </GoogleOAuthProvider>
   );
 }
 

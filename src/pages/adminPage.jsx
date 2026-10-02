@@ -1,15 +1,64 @@
 import { Link, useLocation } from "react-router-dom";
 import { Routes, Route } from "react-router-dom";
+import {useState} from "react";
+import {toast } from "react-hot-toast"
+
+import axios from "axios";
+
 
 import AdminProductPage from "./admin/adminProductPage";
 import AddProductPage from "./admin/addProductPage";
 import EditProductPage from "./admin/productPageEdit";
 import AdminOrderPage from "./admin/adminOrderPage";
+import { useEffect } from "react";
+import Loading from "../components/loading";
 
 export default function AdminPage() {
 
   const location = useLocation();
   const path = location.pathname;
+  const [status,setStatus]=useState("loading");
+
+  useEffect(()=>{
+    const token=localStorage.getItem("token");
+    if(!token){
+      setStatus("unauthenticated");
+      window.location.href="/login";
+
+    }
+    else{
+
+      axios.get(import.meta.env.VITE_BACKEND_URL+"/api/user",{
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      }).then((res)=>{
+        if(res.data.role!=="admin"){
+          setStatus("unauthorized");
+          toast.error("you are not authorized to access this page");
+          
+          window.location.href="/";
+
+        }else{
+          setStatus("authenticated");
+
+
+        }
+      }).catch((err)=>{
+        setStatus("unauthenticated");
+        toast.error("you are not authorized to access this page,please login first");
+
+        window.location.href="/login";
+        console.error(err);
+
+
+      })
+      
+
+    }
+
+
+  },[status])
 
   function getClass(name) {
 
@@ -35,6 +84,8 @@ export default function AdminPage() {
     <div className="w-full h-screen flex bg-[#FBFBFB]">
 
       {/* ================= SIDEBAR ================= */}
+{status == "loading"  || status == "unauthenticated" ? <Loading/> : (
+      <>
 
       <div
         className="
@@ -140,6 +191,8 @@ export default function AdminPage() {
         </Routes>
 
       </div>
+    </>)
+}
 
     </div>
   );

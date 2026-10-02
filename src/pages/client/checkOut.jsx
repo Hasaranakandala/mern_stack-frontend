@@ -84,6 +84,8 @@ export default function CheckOut() {
 
   // ================= PLACE ORDER =================
 
+
+
   async function placeOrder() {
 
     const token =
@@ -1408,3 +1410,23 @@ export default function CheckOut() {
   );
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

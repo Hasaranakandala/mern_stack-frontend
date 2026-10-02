@@ -4,6 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import ProductPage from "./client/ProductPage";
 import ProductOverview from "./client/productOverview";
 import CheckOut from "./client/checkOut";
+import SearchProductPage from "./client/searchProduct";
 
 export default function HomePage() {
   return (
@@ -116,7 +117,10 @@ export default function HomePage() {
             path="/checkout"
             element={<CheckOut />}
           />
-
+ <Route
+            path="/search"
+            element={<SearchProductPage />}
+          />
 
           {/* 404 */}
           <Route
