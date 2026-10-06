@@ -1,12 +1,18 @@
 import { useState } from "react";
-import { useLocation, Link } from "react-router-dom";
+import {
+  useLocation,
+  Link,
+  useNavigate,
+} from "react-router-dom";
 import { FaTrash } from "react-icons/fa";
 import { BsCart3 } from "react-icons/bs";
 import toast from "react-hot-toast";
 import axios from "axios";
-
+import {
+  clearCart,
+} from "../../utils/cart.js";
 export default function CheckOut() {
-
+const navigate = useNavigate();
   const location = useLocation();
 
   const [cart, setCart] = useState(
@@ -181,31 +187,32 @@ export default function CheckOut() {
 
       setIsPlacingOrder(true);
 
-
-      await axios.post(
-
-        import.meta.env.VITE_BACKEND_URL +
-          "/api/order",
-
-        orderInformation,
-
-        {
-
-          headers: {
-
-            Authorization:
-              "Bearer " + token,
-
-          },
-
-        }
-
-      );
+await axios.post(
+  import.meta.env.VITE_BACKEND_URL +
+    "/api/order",
+  orderInformation,
+  {
+    headers: {
+      Authorization:
+        "Bearer " + token,
+    },
+  }
+);
 
 
-      toast.success(
-        "Order placed successfully!"
-      );
+clearCart();
+
+
+setCart([]);
+
+
+toast.success(
+  "Order placed successfully!"
+);
+
+navigate("/", {
+  replace: true,
+});
 
 
     } catch (err) {

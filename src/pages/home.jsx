@@ -1,10 +1,13 @@
 import Header from "../components/Header";
 import { Route, Routes } from "react-router-dom";
-
+import ClientHome from "./client/ClientHome";
 import ProductPage from "./client/ProductPage";
 import ProductOverview from "./client/productOverview";
 import CheckOut from "./client/checkOut";
 import SearchProductPage from "./client/searchProduct";
+import About from "./about";
+import Contact from "./contact"
+
 
 export default function HomePage() {
   return (
@@ -33,26 +36,11 @@ export default function HomePage() {
         <Routes>
 
           {/* Home */}
-          <Route
-            path="/"
-            element={
-              <div
-                className="
-                  w-full
-                  min-h-full
-                  flex
-                  items-center
-                  justify-center
-                  px-4
-                "
-              >
-                <h1 className="text-3xl font-bold text-gray-800">
-                  Home
-                </h1>
-              </div>
-            }
-          />
-
+        
+<Route
+  path="/"
+  element={<ClientHome />}
+/>
 
           {/* Products */}
           <Route
@@ -64,44 +52,13 @@ export default function HomePage() {
           {/* About */}
           <Route
             path="/about"
-            element={
-              <div
-                className="
-                  w-full
-                  min-h-full
-                  flex
-                  items-center
-                  justify-center
-                  px-4
-                "
-              >
-                <h1 className="text-3xl font-bold text-gray-800">
-                  About
-                </h1>
-              </div>
-            }
-          />
-
+            element={<About/>}
+/>
 
           {/* Contacts */}
           <Route
             path="/contacts"
-            element={
-              <div
-                className="
-                  w-full
-                  min-h-full
-                  flex
-                  items-center
-                  justify-center
-                  px-4
-                "
-              >
-                <h1 className="text-3xl font-bold text-gray-800">
-                  Contacts
-                </h1>
-              </div>
-            }
+            element={<Contact/>}
           />
 
 

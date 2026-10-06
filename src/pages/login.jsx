@@ -2,72 +2,113 @@ import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+
 import { FaGoogle } from "react-icons/fa";
+
 import {
   FiMail,
   FiLock,
   FiEye,
   FiEyeOff,
 } from "react-icons/fi";
+
 import { useGoogleLogin } from "@react-oauth/google";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] =
+    useState(false);
+
+  const [isLoading, setIsLoading] =
+    useState(false);
 
   const navigate = useNavigate();
 
+  // ============================================
+  // GOOGLE LOGIN
+  // ============================================
 
-  // adding google through  login
-const googleLogin = useGoogleLogin({
-  onSuccess: async (response) => {
-    try {
-      const accessToken = response.access_token;
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (response) => {
+      try {
+        const accessToken =
+          response.access_token;
 
-      const result = await axios.post(
-        import.meta.env.VITE_BACKEND_URL + "/api/user/login/google",
-        {
-          accessToken: accessToken
+        const result = await axios.post(
+          import.meta.env.VITE_BACKEND_URL +
+            "/api/user/login/google",
+          {
+            accessToken: accessToken,
+          }
+        );
+
+        toast.success(
+          "Login successfully!"
+        );
+
+        const token =
+          result.data.token;
+
+        localStorage.setItem(
+          "token",
+          token
+        );
+
+        if (
+          result.data.role === "admin"
+        ) {
+          navigate("/admin/");
+        } else {
+          navigate("/");
         }
-      );
+      } catch (error) {
+        console.log(
+          "Google login error:",
+          error.response?.data ||
+            error.message
+        );
 
-    toast.success("login successfully !");
-      const token =result.data.token
-      localStorage.setItem("token",token)
-      if(result.data.role=="admin"){
-        navigate("/admin/");
-
+        toast.error(
+          error.response?.data
+            ?.message ||
+            "Google login failed"
+        );
       }
-      else{
-        navigate("/");
+    },
 
-      }
-
-    } catch (error) {
+    onError: () => {
       console.log(
-        "Google login error:",
-        error.response?.data || error.message
+        "Google Login Failed"
       );
-    }
-  },
 
-  onError: () => {
-    console.log("Google Login Failed");
-  }
-});
+      toast.error(
+        "Google login failed"
+      );
+    },
+  });
+
+  // ============================================
+  // NORMAL LOGIN
+  // ============================================
+
   async function handleLogin(e) {
     e.preventDefault();
 
     if (!email.trim()) {
-      toast.error("Please enter your email");
+      toast.error(
+        "Please enter your email"
+      );
+
       return;
     }
 
     if (!password.trim()) {
-      toast.error("Please enter your password");
+      toast.error(
+        "Please enter your password"
+      );
+
       return;
     }
 
@@ -75,37 +116,52 @@ const googleLogin = useGoogleLogin({
       setIsLoading(true);
 
       const res = await axios.post(
-        import.meta.env.VITE_BACKEND_URL + "/api/user/login",
+        import.meta.env
+          .VITE_BACKEND_URL +
+          "/api/user/login",
         {
           email: email,
           password: password,
         }
       );
 
-      toast.success("Login successful!");
+      toast.success(
+        "Login successful!"
+      );
 
-      localStorage.setItem("token", res.data.token);
+      localStorage.setItem(
+        "token",
+        res.data.token
+      );
 
-      if (res.data.role === "admin") {
+      if (
+        res.data.role === "admin"
+      ) {
         navigate("/admin");
       } else {
         navigate("/");
       }
     } catch (error) {
-      console.log("LOGIN ERROR:", error);
+      console.log(
+        "LOGIN ERROR:",
+        error
+      );
 
       if (error.response) {
         toast.error(
-          error.response.data?.message || "Login failed"
+          error.response.data
+            ?.message ||
+            "Login failed"
         );
       } else {
-        toast.error("Server connection failed");
+        toast.error(
+          "Server connection failed"
+        );
       }
     } finally {
       setIsLoading(false);
     }
   }
-
 
   return (
     <main
@@ -132,17 +188,23 @@ const googleLogin = useGoogleLogin({
         py-8
       "
     >
-      {/* Background Overlay */}
+      {/* ============================================
+          BACKGROUND OVERLAY
+      ============================================ */}
+
       <div
         className="
           absolute
           inset-0
+
           bg-black/30
           lg:bg-black/20
         "
       />
 
-      {/* ================= LEFT CONTENT ================= */}
+      {/* ============================================
+          LEFT CONTENT
+      ============================================ */}
 
       <section
         className="
@@ -168,6 +230,7 @@ const googleLogin = useGoogleLogin({
             className="
               text-sm
               font-semibold
+
               uppercase
               tracking-[0.25em]
 
@@ -190,7 +253,8 @@ const googleLogin = useGoogleLogin({
               drop-shadow-md
             "
           >
-            Login and continue your shopping journey.
+            Login and continue your
+            shopping journey.
           </h1>
 
           <p
@@ -207,13 +271,17 @@ const googleLogin = useGoogleLogin({
               max-w-[470px]
             "
           >
-            Access your account, manage your orders and
-            continue shopping from where you stopped.
+            Access your account, manage
+            your orders and continue
+            shopping from where you
+            stopped.
           </p>
         </div>
       </section>
 
-      {/* ================= LOGIN CARD ================= */}
+      {/* ============================================
+          LOGIN CARD
+      ============================================ */}
 
       <section
         className="
@@ -251,7 +319,10 @@ const googleLogin = useGoogleLogin({
             sm:py-10
           "
         >
-          {/* Heading */}
+          {/* ============================================
+              HEADING
+          ============================================ */}
+
           <div className="mb-8">
             <p
               className="
@@ -293,17 +364,23 @@ const googleLogin = useGoogleLogin({
                 leading-relaxed
               "
             >
-              Enter your email and password to continue.
+              Enter your email and
+              password to continue.
             </p>
           </div>
 
-          {/* ================= FORM ================= */}
+          {/* ============================================
+              FORM
+          ============================================ */}
 
           <form
             onSubmit={handleLogin}
             className="space-y-5"
           >
-            {/* Email */}
+            {/* ============================================
+                EMAIL
+            ============================================ */}
+
             <div>
               <label
                 htmlFor="email"
@@ -326,6 +403,7 @@ const googleLogin = useGoogleLogin({
                   aria-hidden="true"
                   className="
                     absolute
+
                     left-4
                     top-1/2
                     -translate-y-1/2
@@ -342,7 +420,9 @@ const googleLogin = useGoogleLogin({
                   autoComplete="email"
                   placeholder="Enter your email"
                   onChange={(e) =>
-                    setEmail(e.target.value)
+                    setEmail(
+                      e.target.value
+                    )
                   }
                   className="
                     w-full
@@ -378,7 +458,10 @@ const googleLogin = useGoogleLogin({
               </div>
             </div>
 
-            {/* Password */}
+            {/* ============================================
+                PASSWORD
+            ============================================ */}
+
             <div>
               <label
                 htmlFor="password"
@@ -401,6 +484,7 @@ const googleLogin = useGoogleLogin({
                   aria-hidden="true"
                   className="
                     absolute
+
                     left-4
                     top-1/2
                     -translate-y-1/2
@@ -421,7 +505,9 @@ const googleLogin = useGoogleLogin({
                   autoComplete="current-password"
                   placeholder="Enter your password"
                   onChange={(e) =>
-                    setPassword(e.target.value)
+                    setPassword(
+                      e.target.value
+                    )
                   }
                   className="
                     w-full
@@ -455,10 +541,14 @@ const googleLogin = useGoogleLogin({
                   required
                 />
 
+                {/* SHOW / HIDE PASSWORD */}
+
                 <button
                   type="button"
                   onClick={() =>
-                    setShowPassword(!showPassword)
+                    setShowPassword(
+                      !showPassword
+                    )
                   }
                   aria-label={
                     showPassword
@@ -467,6 +557,7 @@ const googleLogin = useGoogleLogin({
                   }
                   className="
                     absolute
+
                     right-3
                     top-1/2
                     -translate-y-1/2
@@ -506,7 +597,53 @@ const googleLogin = useGoogleLogin({
               </div>
             </div>
 
-            {/* Login Button */}
+            {/* ============================================
+                FORGOT PASSWORD
+            ============================================ */}
+
+            <div
+              className="
+                flex
+                justify-center
+
+                -mt-1
+              "
+            >
+              <button
+                type="button"
+                onClick={() =>
+                  navigate(
+                    "/forget"
+                  )
+                }
+                className="
+                  text-sm
+                  font-semibold
+
+                  text-red-500
+
+                  transition-colors
+                  duration-200
+
+                  hover:text-red-600
+                  hover:underline
+
+                  focus:outline-none
+                  focus-visible:ring-2
+                  focus-visible:ring-red-400
+                  focus-visible:ring-offset-2
+
+                  rounded-md
+                "
+              >
+                Forgot password?
+              </button>
+            </div>
+
+            {/* ============================================
+                LOGIN BUTTON
+            ============================================ */}
+
             <button
               type="submit"
               disabled={isLoading}
@@ -569,52 +706,61 @@ const googleLogin = useGoogleLogin({
                 "Login"
               )}
             </button>
+
+            {/* ============================================
+                GOOGLE LOGIN
+            ============================================ */}
+
             <button
-  type="button"
-  className="
-    w-full
-    min-h-[52px]
-    mt-3
+              type="button"
+              className="
+                w-full
+                min-h-[52px]
 
-    rounded-xl
+                mt-3
 
-    bg-white
-    text-gray-700
+                rounded-xl
 
-    font-semibold
-    text-base
+                bg-white
+                text-gray-700
 
-    border
-    border-gray-300
+                font-semibold
+                text-base
 
-    flex
-    items-center
-    justify-center
-    gap-3
+                border
+                border-gray-300
 
-    shadow-sm
+                flex
+                items-center
+                justify-center
+                gap-3
 
-    transition-all
-    duration-200
+                shadow-sm
 
-    hover:bg-gray-50
-    hover:border-gray-400
-    hover:shadow-md
+                transition-all
+                duration-200
 
-    active:scale-[0.98]
+                hover:bg-gray-50
+                hover:border-gray-400
+                hover:shadow-md
 
-    focus:outline-none
-    focus-visible:ring-4
-    focus-visible:ring-gray-200
-  "
-  onClick={googleLogin}
->
-  <FaGoogle className="text-xl" />
-  Continue with Google
-</button>
+                active:scale-[0.98]
+
+                focus:outline-none
+                focus-visible:ring-4
+                focus-visible:ring-gray-200
+              "
+              onClick={googleLogin}
+            >
+              <FaGoogle className="text-xl" />
+
+              Continue with Google
+            </button>
           </form>
 
-          {/* ================= SIGN UP ================= */}
+          {/* ============================================
+              SIGN UP
+          ============================================ */}
 
           <div
             className="
@@ -668,4 +814,3 @@ const googleLogin = useGoogleLogin({
     </main>
   );
 }
-

@@ -17,6 +17,9 @@ import AdminPage from "./pages/adminPage";
 import TestPage from "./pages/test";
 import RegisterPage from "./pages/rejister";
 import ForgetPassword from "./pages/forgetPassword"
+import About from "./pages/about";
+import Contact from "./pages/contact";
+
 
 
 
@@ -51,10 +54,18 @@ function App() {
         }/>
 
         <Route
-          path="/rejister"
+          path="/signup"
           element={<RegisterPage />}
         />
-
+        <Route
+          path="/about"
+          element={<About />}
+        />
+    
+        <Route
+          path="/contacts"
+          element={<Contact />}
+        />
         <Route
           path="/testing"
           element={<TestPage />}
