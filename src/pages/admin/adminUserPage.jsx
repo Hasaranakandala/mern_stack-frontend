@@ -1,178 +1,539 @@
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import toast from "react-hot-toast";
+
 import Loading from "../../components/loading";
 
+/*
+=========================================================
+VELMORA — CUSTOMER & ACCESS MANAGEMENT
+=========================================================
+
+Primary Violet   #6C5CE7
+Soft Lavender    #B8A1FF
+Soft Rose        #F2B8C6
+Champagne        #EADBC8
+Warm Ivory       #FAF9F7
+Surface          #FFFFFF
+Charcoal         #2F3136
+Muted Text       #6B7280
+
+Success          #4F9D7A
+Warning          #D99A3E
+Error            #D95C5C
+
+Admin direction:
+Quiet Luxury
+Professional
+Customer-focused
+Structured
+Mobile-first
+=========================================================
+*/
+
+/* =========================================================
+   ICONS
+========================================================= */
+
+function RefreshIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path d="M4 4v6h6" />
+      <path d="M20 20v-6h-6" />
+      <path d="M5.6 15A7 7 0 0 0 18 18.4" />
+      <path d="M18.4 9A7 7 0 0 0 6 5.6" />
+    </svg>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-4-4" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <path d="M6 6l12 12" />
+      <path d="M18 6 6 18" />
+    </svg>
+  );
+}
+
+function UsersIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <circle cx="9" cy="8" r="3" />
+      <path d="M3.5 19c.5-3.5 2.4-5 5.5-5s5 1.5 5.5 5" />
+      <path d="M16 5.5a3 3 0 0 1 0 5" />
+      <path d="M16.5 14c2.5.4 3.7 2 4 5" />
+    </svg>
+  );
+}
+
+function ShieldIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <path d="M12 3 5 6v5c0 4.7 2.7 8 7 10 4.3-2 7-5.3 7-10V6l-7-3Z" />
+      <path d="m9.5 12 1.7 1.7 3.5-4" />
+    </svg>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <rect
+        x="5"
+        y="10"
+        width="14"
+        height="10"
+        rx="2"
+      />
+
+      <path d="M8 10V7a4 4 0 1 1 8 0v3" />
+    </svg>
+  );
+}
+
+function UnlockIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <rect
+        x="5"
+        y="10"
+        width="14"
+        height="10"
+        rx="2"
+      />
+
+      <path d="M8 10V7a4 4 0 0 1 7.5-2" />
+    </svg>
+  );
+}
+
+function CopyIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <rect
+        x="8"
+        y="8"
+        width="11"
+        height="11"
+        rx="2"
+      />
+
+      <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
+    </svg>
+  );
+}
+
+function ArrowIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path d="m9 5 7 7-7 7" />
+    </svg>
+  );
+}
+
+/* =========================================================
+   USER AVATAR
+========================================================= */
+
+function UserAvatar({
+  user,
+  size = "medium",
+  getUserImage,
+  getInitials,
+  getUserName,
+}) {
+  const [imageFailed, setImageFailed] =
+    useState(false);
+
+  const image =
+    getUserImage(user);
+
+  const sizeClass =
+    size === "large"
+      ? "h-16 w-16 rounded-[20px] text-lg"
+      : size === "small"
+      ? "h-10 w-10 rounded-xl text-xs"
+      : "h-12 w-12 rounded-2xl text-sm";
+
+  if (
+    image &&
+    !imageFailed
+  ) {
+    return (
+      <div
+        className={`
+          ${sizeClass}
+
+          shrink-0
+          overflow-hidden
+
+          border
+          border-[#E5DDEE]
+
+          bg-[#F4F0FF]
+
+          shadow-sm
+        `}
+      >
+        <img
+          src={image}
+          alt={`${getUserName(
+            user
+          )} profile`}
+          className="
+            h-full
+            w-full
+            object-cover
+          "
+          onError={() =>
+            setImageFailed(
+              true
+            )
+          }
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`
+        ${sizeClass}
+
+        flex
+        shrink-0
+        items-center
+        justify-center
+
+        bg-gradient-to-br
+        from-[#6C5CE7]
+        to-[#B8A1FF]
+
+        font-extrabold
+        text-white
+
+        shadow-[0_8px_20px_rgba(108,92,231,0.18)]
+      `}
+    >
+      {getInitials(user) ||
+        "V"}
+    </div>
+  );
+}
+
+/* =========================================================
+   PAGE
+========================================================= */
+
 export default function AdminUserPage() {
-  const [users, setUsers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [
+    users,
+    setUsers,
+  ] = useState([]);
 
-  const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [
+    isLoading,
+    setIsLoading,
+  ] = useState(true);
 
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [
+    search,
+    setSearch,
+  ] = useState("");
 
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [
+    roleFilter,
+    setRoleFilter,
+  ] = useState("all");
 
-  const [updatingUserId, setUpdatingUserId] =
-    useState(null);
+  const [
+    statusFilter,
+    setStatusFilter,
+  ] = useState("all");
 
-  // =====================================================
-  // HELPERS
-  // =====================================================
+  const [
+    selectedUser,
+    setSelectedUser,
+  ] = useState(null);
+
+  const [
+    isRefreshing,
+    setIsRefreshing,
+  ] = useState(false);
+
+  const [
+    updatingUserId,
+    setUpdatingUserId,
+  ] = useState(null);
+
+  /* =====================================================
+     HELPERS
+  ===================================================== */
 
   function getUserName(user) {
-    const fullName = `${user.firstName || ""} ${
-      user.lastName || ""
-    }`.trim();
+    const fullName =
+      `${user?.firstName || ""} ${
+        user?.lastName || ""
+      }`.trim();
 
-    return fullName || "Unknown User";
+    return (
+      fullName ||
+      "Unknown Customer"
+    );
   }
 
   function getUserId(user) {
-    return user._id || user.userId || "-";
+    return (
+      user?._id ||
+      user?.userId ||
+      "-"
+    );
   }
 
   function getUserRole(user) {
-    return user.role || "customer";
+    return (
+      user?.role ||
+      "customer"
+    );
   }
 
   function getUserImage(user) {
-    return user.img || "";
+    return (
+      user?.img || ""
+    );
   }
 
   function getInitials(user) {
     return getUserName(user)
       .split(" ")
       .slice(0, 2)
-      .map((name) => name.charAt(0).toUpperCase())
+      .map((name) =>
+        name
+          .charAt(0)
+          .toUpperCase()
+      )
       .join("");
   }
 
-  // =====================================================
-  // ROLE STYLE
-  // =====================================================
-
   function getRoleStyle(role) {
-    if (role === "admin") {
-      return "bg-purple-100 text-purple-700 border-purple-200";
+    if (
+      role === "admin"
+    ) {
+      return "border-[#DFD3F7] bg-[#F3EEFF] text-[#6C5CE7]";
     }
 
-    return "bg-blue-100 text-blue-700 border-blue-200";
+    return "border-[#F1DCE3] bg-[#FFF3F7] text-[#B46079]";
   }
 
-  // =====================================================
-  // LOAD USERS
-  // =====================================================
+  function getStatusStyle(
+    isBlocked
+  ) {
+    if (isBlocked) {
+      return "border-[#F0D4D9] bg-[#FFF1F3] text-[#B45462]";
+    }
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
+    return "border-[#D5E9DF] bg-[#EDF7F2] text-[#478465]";
+  }
+
+  /* =====================================================
+     FETCH USERS
+  ===================================================== */
+
+  async function fetchUsers(
+    showSuccess = false
+  ) {
+    const token =
+      localStorage.getItem(
+        "token"
+      );
 
     if (!token) {
-      toast.error("Please login first");
+      toast.error(
+        "Please sign in first"
+      );
+
       setIsLoading(false);
+
+      setIsRefreshing(
+        false
+      );
+
       return;
     }
-
-    axios
-      .get(
-        import.meta.env.VITE_BACKEND_URL +
-          "/api/user",
-        {
-          headers: {
-            Authorization:
-              "Bearer " + token,
-          },
-        }
-      )
-      .then((res) => {
-        console.log("USERS:", res.data);
-
-        const userList = Array.isArray(res.data)
-          ? res.data
-          : res.data.users ||
-            res.data.data ||
-            [];
-
-        setUsers(userList);
-
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error(
-          "GET USERS ERROR:",
-          error.response?.data || error
-        );
-
-        toast.error(
-          error.response?.data?.message ||
-            "Failed to load users"
-        );
-
-        setIsLoading(false);
-      });
-  }, []);
-
-  // =====================================================
-  // REFRESH USERS
-  // =====================================================
-
-  async function refreshUsers() {
-    const token =
-      localStorage.getItem("token");
-
-    if (!token || isRefreshing) {
-      return;
-    }
-
-    setIsRefreshing(true);
 
     try {
-      const res = await axios.get(
-        import.meta.env.VITE_BACKEND_URL +
-          "/api/user",
-        {
-          headers: {
-            Authorization:
-              "Bearer " + token,
-          },
-        }
+      const res =
+        await axios.get(
+          import.meta.env
+            .VITE_BACKEND_URL +
+            "/api/user",
+
+          {
+            headers: {
+              Authorization:
+                "Bearer " +
+                token,
+            },
+          }
+        );
+
+      const userList =
+        Array.isArray(
+          res.data
+        )
+          ? res.data
+          : res.data?.users ||
+            res.data?.data ||
+            [];
+
+      setUsers(
+        userList
       );
 
-      const userList = Array.isArray(
-        res.data
-      )
-        ? res.data
-        : res.data.users ||
-          res.data.data ||
-          [];
-
-      setUsers(userList);
-
-      toast.success("Users refreshed");
+      if (showSuccess) {
+        toast.success(
+          "Velmora accounts refreshed"
+        );
+      }
     } catch (error) {
-      console.error(error);
+      console.error(
+        "GET USERS ERROR:",
+        error.response
+          ?.data ||
+          error
+      );
 
       toast.error(
-        error.response?.data?.message ||
-          "Failed to refresh users"
+        error.response
+          ?.data
+          ?.message ||
+          "Failed to load Velmora accounts"
       );
     } finally {
-      setIsRefreshing(false);
+      setIsLoading(false);
+
+      setIsRefreshing(
+        false
+      );
     }
   }
 
-  // =====================================================
-  // BLOCK / UNBLOCK USER
-  // =====================================================
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
-  async function toggleBlockUser(user) {
+  /* =====================================================
+     REFRESH
+  ===================================================== */
+
+  async function refreshUsers() {
+    if (isRefreshing) {
+      return;
+    }
+
+    setIsRefreshing(
+      true
+    );
+
+    await fetchUsers(
+      true
+    );
+  }
+
+  /* =====================================================
+     BLOCK / UNBLOCK
+  ===================================================== */
+
+  async function toggleBlockUser(
+    user
+  ) {
     const token =
-      localStorage.getItem("token");
+      localStorage.getItem(
+        "token"
+      );
 
     if (!token) {
-      toast.error("Please login first");
+      toast.error(
+        "Please sign in first"
+      );
+
       return;
     }
 
@@ -182,73 +543,95 @@ export default function AdminUserPage() {
     const action =
       newBlockStatus
         ? "block"
-        : "unblock";
+        : "restore access for";
 
-    const confirmed = window.confirm(
-      `Are you sure you want to ${action} ${getUserName(
-        user
-      )}?`
-    );
+    const confirmed =
+      window.confirm(
+        `Are you sure you want to ${action} ${getUserName(
+          user
+        )}?`
+      );
 
     if (!confirmed) {
       return;
     }
 
-    setUpdatingUserId(getUserId(user));
+    const userId =
+      getUserId(user);
+
+    setUpdatingUserId(
+      userId
+    );
 
     try {
       await axios.put(
-        import.meta.env.VITE_BACKEND_URL +
+        import.meta.env
+          .VITE_BACKEND_URL +
           "/api/user/" +
-          getUserId(user) +
+          userId +
           "/block",
+
         {
-          isBlock: newBlockStatus,
+          isBlock:
+            newBlockStatus,
         },
+
         {
           headers: {
             Authorization:
-              "Bearer " + token,
+              "Bearer " +
+              token,
           },
         }
       );
 
-      // Update users list immediately
+      /* Update table/cards */
 
-      setUsers((previousUsers) =>
-        previousUsers.map((item) =>
-          getUserId(item) ===
-          getUserId(user)
-            ? {
-                ...item,
-                isBlock:
-                  newBlockStatus,
-              }
-            : item
-        )
+      setUsers(
+        (
+          previousUsers
+        ) =>
+          previousUsers.map(
+            (item) =>
+              getUserId(
+                item
+              ) === userId
+                ? {
+                    ...item,
+
+                    isBlock:
+                      newBlockStatus,
+                  }
+                : item
+          )
       );
 
-      // Update selected modal user
+      /* Update modal */
 
-      setSelectedUser((previous) => {
-        if (
-          !previous ||
-          getUserId(previous) !==
-            getUserId(user)
-        ) {
-          return previous;
+      setSelectedUser(
+        (previous) => {
+          if (
+            !previous ||
+            getUserId(
+              previous
+            ) !== userId
+          ) {
+            return previous;
+          }
+
+          return {
+            ...previous,
+
+            isBlock:
+              newBlockStatus,
+          };
         }
-
-        return {
-          ...previous,
-          isBlock: newBlockStatus,
-        };
-      });
+      );
 
       toast.success(
         newBlockStatus
-          ? "User blocked successfully"
-          : "User unblocked successfully"
+          ? "Velmora account blocked"
+          : "Velmora account access restored"
       );
     } catch (error) {
       console.error(
@@ -257,22 +640,33 @@ export default function AdminUserPage() {
       );
 
       toast.error(
-        error.response?.data?.message ||
-          "Failed to update user status"
+        error.response
+          ?.data
+          ?.message ||
+          "Failed to update account access"
       );
     } finally {
-      setUpdatingUserId(null);
+      setUpdatingUserId(
+        null
+      );
     }
   }
 
-  // =====================================================
-  // CLOSE MODAL WITH ESC
-  // =====================================================
+  /* =====================================================
+     ESCAPE
+  ===================================================== */
 
   useEffect(() => {
-    function handleEscape(e) {
-      if (e.key === "Escape") {
-        setSelectedUser(null);
+    function handleEscape(
+      event
+    ) {
+      if (
+        event.key ===
+        "Escape"
+      ) {
+        setSelectedUser(
+          null
+        );
       }
     }
 
@@ -289,9 +683,9 @@ export default function AdminUserPage() {
     };
   }, []);
 
-  // =====================================================
-  // PREVENT BODY SCROLL
-  // =====================================================
+  /* =====================================================
+     LOCK BODY
+  ===================================================== */
 
   useEffect(() => {
     if (selectedUser) {
@@ -308,85 +702,127 @@ export default function AdminUserPage() {
     };
   }, [selectedUser]);
 
-  // =====================================================
-  // FILTER USERS
-  // =====================================================
+  /* =====================================================
+     FILTER
+  ===================================================== */
 
-  const filteredUsers = useMemo(() => {
-    const searchValue = search
-      .trim()
-      .toLowerCase();
+  const filteredUsers =
+    useMemo(() => {
+      const searchValue =
+        search
+          .trim()
+          .toLowerCase();
 
-    return users.filter((user) => {
-      const name =
-        getUserName(user).toLowerCase();
+      return users.filter(
+        (user) => {
+          /*
+            Lowercase here is
+            comparison only.
+            Stored email casing
+            is NOT modified.
+          */
 
-      const email = (
-        user.email || ""
-      ).toLowerCase();
+          const name =
+            getUserName(
+              user
+            ).toLowerCase();
 
-      const userId = String(
-        getUserId(user)
-      ).toLowerCase();
+          const email =
+            String(
+              user.email ||
+                ""
+            ).toLowerCase();
 
-      const role =
-        getUserRole(user).toLowerCase();
+          const userId =
+            String(
+              getUserId(
+                user
+              )
+            ).toLowerCase();
 
-      // ID hidden in UI but still searchable
+          const role =
+            getUserRole(
+              user
+            ).toLowerCase();
 
-      const matchesSearch =
-        searchValue === "" ||
-        name.includes(searchValue) ||
-        email.includes(searchValue) ||
-        userId.includes(searchValue);
+          const matchesSearch =
+            searchValue ===
+              "" ||
+            name.includes(
+              searchValue
+            ) ||
+            email.includes(
+              searchValue
+            ) ||
+            userId.includes(
+              searchValue
+            );
 
-      const matchesRole =
-        roleFilter === "all" ||
-        role === roleFilter;
+          const matchesRole =
+            roleFilter ===
+              "all" ||
+            role ===
+              roleFilter;
 
-      const matchesStatus =
-        statusFilter === "all" ||
-        (statusFilter === "active" &&
-          !user.isBlock) ||
-        (statusFilter === "blocked" &&
-          user.isBlock);
+          const matchesStatus =
+            statusFilter ===
+              "all" ||
+            (statusFilter ===
+              "enabled" &&
+              !user.isBlock) ||
+            (statusFilter ===
+              "blocked" &&
+              user.isBlock);
 
-      return (
-        matchesSearch &&
-        matchesRole &&
-        matchesStatus
+          return (
+            matchesSearch &&
+            matchesRole &&
+            matchesStatus
+          );
+        }
       );
-    });
-  }, [
-    users,
-    search,
-    roleFilter,
-    statusFilter,
-  ]);
+    }, [
+      users,
+      search,
+      roleFilter,
+      statusFilter,
+    ]);
 
-  // =====================================================
-  // COUNTS
-  // =====================================================
+  /* =====================================================
+     COUNTS
+  ===================================================== */
 
-  const activeUsers =
+  const accessEnabledUsers =
     users.filter(
-      (user) => !user.isBlock
+      (user) =>
+        !user.isBlock
     ).length;
 
   const blockedUsers =
     users.filter(
-      (user) => user.isBlock
+      (user) =>
+        user.isBlock
     ).length;
 
   const adminUsers =
     users.filter(
       (user) =>
-        getUserRole(user) === "admin"
+        getUserRole(
+          user
+        ) === "admin"
     ).length;
 
-  // =====================================================
-  // COPY
-  // =====================================================
+  const customerUsers =
+    users.filter(
+      (user) =>
+        getUserRole(
+          user
+        ) !== "admin"
+    ).length;
+
+  /* =====================================================
+     COPY
+  ===================================================== */
 
   async function copyText(
     text,
@@ -397,1566 +833,2308 @@ export default function AdminUserPage() {
         text
       );
 
-      toast.success(message);
+      toast.success(
+        message
+      );
     } catch {
-      toast.error("Unable to copy");
+      toast.error(
+        "Unable to copy"
+      );
     }
   }
 
-  // =====================================================
-  // LOADING
-  // =====================================================
+  /* =====================================================
+     CLEAR FILTERS
+  ===================================================== */
+
+  function clearFilters() {
+    setSearch("");
+
+    setRoleFilter(
+      "all"
+    );
+
+    setStatusFilter(
+      "all"
+    );
+  }
+
+  /* =====================================================
+     LOADING
+  ===================================================== */
 
   if (isLoading) {
-    return <Loading />;
+    return (
+      <Loading
+        message="Preparing Velmora customer accounts..."
+        fullScreen={false}
+      />
+    );
   }
+
+  /* =====================================================
+     PAGE
+  ===================================================== */
 
   return (
     <div
       className="
-        w-full
+        relative
+
         min-h-screen
-
-        bg-[#F8F9FA]
-
-        p-3
-        sm:p-5
-        md:p-8
+        w-full
 
         overflow-x-hidden
 
-        animate-[pageEnter_0.4s_ease-out]
+        bg-[#FAF9F7]
+
+        p-3
+
+        sm:p-5
+
+        lg:p-7
+
+        xl:p-8
+
+        animate-[velmoraUserPageEnter_0.4s_ease-out]
       "
     >
-      {/* =================================================
-          USER DETAILS MODAL
-      ================================================= */}
+      {/* BACKGROUND LIGHT */}
 
-      {selectedUser && (
-        <div
-          onClick={() =>
-            setSelectedUser(null)
-          }
-          className="
-            fixed
-            inset-0
-            z-[9999]
+      <div
+        className="
+          pointer-events-none
 
-            bg-black/50
-            backdrop-blur-sm
+          absolute
+          -left-36
+          -top-28
 
-            flex
-            items-center
-            justify-center
+          h-[380px]
+          w-[380px]
 
-            p-3
-            sm:p-5
-          "
-        >
+          rounded-full
+
+          bg-[#B8A1FF]/8
+
+          blur-[120px]
+        "
+      />
+
+      <div
+        className="
+          pointer-events-none
+
+          absolute
+          -right-40
+          top-[520px]
+
+          h-[420px]
+          w-[420px]
+
+          rounded-full
+
+          bg-[#F2B8C6]/7
+
+          blur-[130px]
+        "
+      />
+
+      <div
+        className="
+          relative
+          z-10
+
+          mx-auto
+          w-full
+          max-w-[1500px]
+        "
+      >
+        {/* =================================================
+            USER DETAILS MODAL
+        ================================================= */}
+
+        {selectedUser && (
           <div
-            onClick={(e) =>
-              e.stopPropagation()
-            }
-            className="
-              w-full
-              max-w-lg
-
-              max-h-[90vh]
-              overflow-y-auto
-
-              bg-white
-
-              rounded-2xl
-              sm:rounded-3xl
-
-              shadow-2xl
-
-              animate-[modalEnter_0.25s_ease-out]
-            "
-          >
-            {/* Header */}
-
-            <div
-              className="
-                sticky
-                top-0
-                z-10
-
-                bg-white/95
-                backdrop-blur-md
-
-                border-b
-                border-gray-100
-
-                p-4
-                sm:p-6
-
-                flex
-                items-center
-                justify-between
-
-                gap-3
-              "
-            >
-              <div
-                className="
-                  flex
-                  items-center
-                  gap-3
-
-                  min-w-0
-                "
-              >
-                {/* Image */}
-
-                <div
-                  className="
-                    w-14
-                    h-14
-
-                    shrink-0
-
-                    rounded-2xl
-
-                    overflow-hidden
-
-                    bg-purple-100
-
-                    shadow-sm
-                  "
-                >
-                  {getUserImage(
-                    selectedUser
-                  ) ? (
-                    <img
-                      src={getUserImage(
-                        selectedUser
-                      )}
-                      alt={getUserName(
-                        selectedUser
-                      )}
-                      className="
-                        w-full
-                        h-full
-                        object-cover
-                      "
-                      onError={(e) => {
-                        e.currentTarget.style.display =
-                          "none";
-                      }}
-                    />
-                  ) : (
-                    <div
-                      className="
-                        w-full
-                        h-full
-
-                        flex
-                        items-center
-                        justify-center
-
-                        text-purple-700
-
-                        font-bold
-                      "
-                    >
-                      {getInitials(
-                        selectedUser
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                <div className="min-w-0">
-
-                  <h2
-                    className="
-                      text-lg
-                      sm:text-xl
-
-                      font-bold
-                      text-[#393E46]
-
-                      truncate
-                    "
-                  >
-                    {getUserName(
-                      selectedUser
-                    )}
-                  </h2>
-
-                  <div
-                    className="
-                      flex
-                      items-center
-                      gap-2
-
-                      mt-1
-                    "
-                  >
-                    <span
-                      className={`
-                        px-2.5
-                        py-1
-
-                        rounded-full
-
-                        border
-
-                        text-[11px]
-                        font-bold
-                        capitalize
-
-                        ${getRoleStyle(
-                          getUserRole(
-                            selectedUser
-                          )
-                        )}
-                      `}
-                    >
-                      {getUserRole(
-                        selectedUser
-                      )}
-                    </span>
-
-                    <span
-                      className={`
-                        px-2.5
-                        py-1
-
-                        rounded-full
-
-                        text-[11px]
-                        font-bold
-
-                        ${
-                          selectedUser.isBlock
-                            ? "bg-red-100 text-red-700"
-                            : "bg-green-100 text-green-700"
-                        }
-                      `}
-                    >
-                      {selectedUser.isBlock
-                        ? "Blocked"
-                        : "Active"}
-                    </span>
-
-                  </div>
-
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setSelectedUser(null)
-                }
-                className="
-                  w-9
-                  h-9
-
-                  shrink-0
-
-                  rounded-full
-
-                  bg-gray-100
-                  text-gray-500
-
-                  flex
-                  items-center
-                  justify-center
-
-                  hover:bg-red-50
-                  hover:text-red-500
-
-                  active:scale-90
-
-                  transition-all
-                "
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Details */}
-
-            <div
-              className="
-                p-4
-                sm:p-6
-
-                space-y-4
-              "
-            >
-              {/* Hidden ID only here */}
-
-              <DetailCard
-                title="User ID"
-                value={getUserId(
-                  selectedUser
-                )}
-                buttonText="Copy"
-                onButtonClick={() =>
-                  copyText(
-                    getUserId(
-                      selectedUser
-                    ),
-                    "User ID copied"
-                  )
-                }
-              />
-
-              <DetailCard
-                title="Full Name"
-                value={getUserName(
-                  selectedUser
-                )}
-              />
-
-              <DetailCard
-                title="Email Address"
-                value={
-                  selectedUser.email ||
-                  "-"
-                }
-                buttonText="Copy"
-                onButtonClick={() =>
-                  copyText(
-                    selectedUser.email ||
-                      "",
-                    "Email copied"
-                  )
-                }
-              />
-
-              {/* Account Status */}
-
-              <div
-                className="
-                  p-4
-
-                  rounded-xl
-
-                  border
-                  border-gray-100
-
-                  bg-gray-50
-                "
-              >
-                <p
-                  className="
-                    text-xs
-                    text-gray-400
-                    mb-2
-                  "
-                >
-                  Account Status
-                </p>
-
-                <div
-                  className="
-                    flex
-                    items-center
-                    justify-between
-
-                    gap-3
-                  "
-                >
-
-                  <div
-                    className="
-                      flex
-                      items-center
-                      gap-2
-                    "
-                  >
-                    <span
-                      className={`
-                        w-2.5
-                        h-2.5
-
-                        rounded-full
-
-                        ${
-                          selectedUser.isBlock
-                            ? "bg-red-500"
-                            : "bg-green-500"
-                        }
-                      `}
-                    />
-
-                    <span
-                      className="
-                        font-semibold
-                        text-[#393E46]
-                      "
-                    >
-                      {selectedUser.isBlock
-                        ? "Blocked"
-                        : "Active"}
-                    </span>
-
-                  </div>
-
-                  <button
-                    type="button"
-                    disabled={
-                      updatingUserId ===
-                      getUserId(
-                        selectedUser
-                      )
-                    }
-                    onClick={() =>
-                      toggleBlockUser(
-                        selectedUser
-                      )
-                    }
-                    className={`
-                      px-4
-                      py-2
-
-                      rounded-lg
-
-                      text-xs
-                      font-bold
-
-                      transition-all
-
-                      active:scale-95
-
-                      disabled:opacity-50
-
-                      ${
-                        selectedUser.isBlock
-                          ? `
-                            bg-green-600
-                            text-white
-                            hover:bg-green-700
-                          `
-                          : `
-                            bg-red-600
-                            text-white
-                            hover:bg-red-700
-                          `
-                      }
-                    `}
-                  >
-                    {updatingUserId ===
-                    getUserId(
-                      selectedUser
-                    )
-                      ? "Updating..."
-                      : selectedUser.isBlock
-                      ? "Unblock User"
-                      : "Block User"}
-                  </button>
-
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      )}
-
-      {/* =================================================
-          HEADER
-      ================================================= */}
-
-      <div
-        className="
-          flex
-          flex-col
-          sm:flex-row
-
-          sm:items-center
-          sm:justify-between
-
-          gap-4
-
-          mb-6
-        "
-      >
-        <div>
-
-          <p
-            className="
-              text-xs
-              uppercase
-              tracking-[0.15em]
-
-              font-bold
-              text-gray-400
-            "
-          >
-            User Management
-          </p>
-
-          <h1
-            className="
-              text-2xl
-              sm:text-3xl
-
-              font-bold
-              text-[#393E46]
-
-              mt-1
-            "
-          >
-            Users
-          </h1>
-
-          <p
-            className="
-              text-sm
-              text-gray-500
-
-              mt-1
-            "
-          >
-            Manage customer accounts and access.
-          </p>
-
-        </div>
-
-        <button
-          type="button"
-          onClick={refreshUsers}
-          disabled={isRefreshing}
-          className="
-            group
-
-            w-full
-            sm:w-auto
-
-            px-4
-            py-2.5
-
-            rounded-xl
-
-            bg-white
-
-            border
-            border-gray-200
-
-            shadow-sm
-
-            flex
-            items-center
-            justify-center
-            gap-2
-
-            text-sm
-            font-semibold
-            text-gray-600
-
-            hover:text-purple-600
-            hover:border-purple-300
-            hover:shadow-md
-
-            active:scale-[0.97]
-
-            disabled:opacity-50
-
-            transition-all
-          "
-        >
-          <svg
-            className={`
-              w-4 h-4
-
-              ${
-                isRefreshing
-                  ? "animate-spin"
-                  : "group-hover:rotate-180 transition-transform duration-500"
-              }
-            `}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M4 4v6h6M20 20v-6h-6M5.64 15A7 7 0 0018 18.36M18.36 9A7 7 0 006 5.64"
-            />
-          </svg>
-
-          {isRefreshing
-            ? "Refreshing..."
-            : "Refresh Users"}
-        </button>
-      </div>
-
-      {/* =================================================
-          STAT CARDS
-      ================================================= */}
-
-      <div
-        className="
-          grid
-          grid-cols-2
-          lg:grid-cols-4
-
-          gap-3
-          sm:gap-4
-
-          mb-5
-        "
-      >
-        <StatCard
-          title="Total Users"
-          value={users.length}
-        />
-
-        <StatCard
-          title="Active"
-          value={activeUsers}
-        />
-
-        <StatCard
-          title="Blocked"
-          value={blockedUsers}
-        />
-
-        <StatCard
-          title="Admins"
-          value={adminUsers}
-        />
-      </div>
-
-      {/* =================================================
-          FILTERS
-      ================================================= */}
-
-      <div
-        className="
-          bg-white
-
-          border
-          border-gray-100
-
-          rounded-2xl
-
-          shadow-sm
-
-          p-4
-          sm:p-5
-
-          mb-5
-        "
-      >
-        <div
-          className="
-            grid
-            grid-cols-1
-            md:grid-cols-[1fr_180px_180px]
-
-            gap-3
-          "
-        >
-          {/* Search */}
-
-          <div className="relative">
-
-            <svg
-              className="
-                absolute
-                left-4
-                top-1/2
-                -translate-y-1/2
-
-                w-5
-                h-5
-
-                text-gray-400
-              "
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z"
-              />
-            </svg>
-
-            <input
-              type="text"
-              value={search}
-              onChange={(e) =>
-                setSearch(
-                  e.target.value
-                )
-              }
-              placeholder="Search name, email or user ID..."
-              className="
-                w-full
-
-                pl-12
-                pr-4
-                py-3
-
-                rounded-xl
-
-                border
-                border-gray-300
-
-                outline-none
-
-                text-sm
-
-                focus:ring-2
-                focus:ring-purple-100
-                focus:border-purple-400
-
-                transition-all
-              "
-            />
-          </div>
-
-          {/* Role */}
-
-          <select
-            value={roleFilter}
-            onChange={(e) =>
-              setRoleFilter(
-                e.target.value
+            onClick={() =>
+              setSelectedUser(
+                null
               )
             }
             className="
-              px-4
-              py-3
-
-              rounded-xl
-
-              border
-              border-gray-300
-
-              bg-white
-
-              text-sm
-              font-semibold
-
-              outline-none
-            "
-          >
-            <option value="all">
-              All Roles
-            </option>
-
-            <option value="customer">
-              Customers
-            </option>
-
-            <option value="admin">
-              Admins
-            </option>
-          </select>
-
-          {/* Status */}
-
-          <select
-            value={statusFilter}
-            onChange={(e) =>
-              setStatusFilter(
-                e.target.value
-              )
-            }
-            className="
-              px-4
-              py-3
-
-              rounded-xl
-
-              border
-              border-gray-300
-
-              bg-white
-
-              text-sm
-              font-semibold
-
-              outline-none
-            "
-          >
-            <option value="all">
-              All Status
-            </option>
-
-            <option value="active">
-              Active
-            </option>
-
-            <option value="blocked">
-              Blocked
-            </option>
-          </select>
-
-        </div>
-
-        <div
-          className="
-            flex
-            items-center
-            justify-between
-
-            gap-3
-
-            mt-3
-          "
-        >
-
-          <p className="text-xs text-gray-400">
-            Showing {filteredUsers.length} of{" "}
-            {users.length} users
-          </p>
-
-          {(search ||
-            roleFilter !== "all" ||
-            statusFilter !==
-              "all") && (
-            <button
-              type="button"
-              onClick={() => {
-                setSearch("");
-                setRoleFilter("all");
-                setStatusFilter(
-                  "all"
-                );
-              }}
-              className="
-                text-xs
-                font-semibold
-                text-purple-600
-
-                hover:text-purple-800
-              "
-            >
-              Clear Filters
-            </button>
-          )}
-
-        </div>
-      </div>
-
-      {/* =================================================
-          USER LIST
-      ================================================= */}
-
-      <div
-        className="
-          bg-white
-
-          rounded-2xl
-
-          border
-          border-gray-100
-
-          shadow-sm
-
-          overflow-hidden
-        "
-      >
-
-        {/* Header */}
-
-        <div
-          className="
-            px-4
-            sm:px-6
-
-            py-4
-            sm:py-5
-
-            border-b
-            border-gray-100
-
-            flex
-            items-center
-            justify-between
-          "
-        >
-
-          <div>
-
-            <h2
-              className="
-                font-bold
-                text-[#393E46]
-              "
-            >
-              User Accounts
-            </h2>
-
-            <p
-              className="
-                text-xs
-                text-gray-400
-
-                mt-1
-              "
-            >
-              Click a user to view full details.
-            </p>
-
-          </div>
-
-          <div
-            className="
-              h-9
-
-              min-w-[36px]
-
-              px-3
-
-              rounded-full
-
-              bg-purple-50
-              text-purple-600
+              fixed
+              inset-0
+              z-[9999]
 
               flex
               items-center
               justify-center
 
-              font-bold
-              text-xs
+              bg-[#29222F]/65
+
+              p-3
+
+              backdrop-blur-md
+
+              sm:p-5
             "
           >
-            {filteredUsers.length}
-          </div>
+            <div
+              onClick={(
+                event
+              ) =>
+                event.stopPropagation()
+              }
+              role="dialog"
+              aria-modal="true"
+              aria-label="Velmora account details"
+              className="
+                w-full
+                max-w-[640px]
 
-        </div>
+                max-h-[92dvh]
+                overflow-y-auto
 
-        {/* Desktop headings */}
+                rounded-[26px]
 
-        <div
-          className="
-            hidden
-            xl:grid
+                border
+                border-[#E8E1EF]
 
-            grid-cols-[1.2fr_1.5fr_120px_120px_150px_45px]
+                bg-white
 
-            gap-4
+                shadow-[0_35px_100px_rgba(33,25,45,0.30)]
 
-            px-6
-            py-4
+                animate-[velmoraUserModalEnter_0.25s_ease-out]
 
-            bg-gray-50
+                sm:rounded-[30px]
+              "
+            >
+              {/* HEADER */}
 
-            border-b
-            border-gray-100
-
-            text-xs
-            font-bold
-            uppercase
-            tracking-wider
-            text-gray-500
-          "
-        >
-          <div>User</div>
-          <div>Email</div>
-          <div>Role</div>
-          <div>Status</div>
-          <div>Action</div>
-          <div></div>
-        </div>
-
-        {/* Users */}
-
-        <div className="divide-y divide-gray-100">
-
-          {filteredUsers.map(
-            (user) => (
               <div
-                key={getUserId(user)}
-                onClick={() =>
-                  setSelectedUser(user)
-                }
                 className="
-                  group
+                  sticky
+                  top-0
+                  z-20
 
-                  cursor-pointer
+                  border-b
+                  border-[#EEE9F2]
 
-                  hover:bg-purple-50/30
+                  bg-white/95
 
-                  transition-all
-                  duration-200
+                  px-4
+                  py-4
+
+                  backdrop-blur-xl
+
+                  sm:px-6
+                  sm:py-5
                 "
               >
-
-                {/* =============================
-                    MOBILE / TABLET
-                ============================= */}
-
                 <div
                   className="
-                    xl:hidden
-
-                    p-4
-                    sm:p-5
+                    flex
+                    items-start
+                    justify-between
+                    gap-4
                   "
                 >
-
                   <div
                     className="
                       flex
-                      items-start
-                      justify-between
-
+                      min-w-0
+                      items-center
                       gap-3
                     "
                   >
+                    <UserAvatar
+                      user={
+                        selectedUser
+                      }
+                      size="large"
+                      getUserImage={
+                        getUserImage
+                      }
+                      getInitials={
+                        getInitials
+                      }
+                      getUserName={
+                        getUserName
+                      }
+                    />
 
-                    <div
-                      className="
-                        flex
-                        items-center
-                        gap-3
+                    <div className="min-w-0">
+                      <p
+                        className="
+                          text-[9px]
+                          font-black
+                          uppercase
+                          tracking-[0.16em]
 
-                        min-w-0
-                      "
-                    >
+                          text-[#927CE4]
+                        "
+                      >
+                        Velmora
+                        Account
+                      </p>
 
-                      {/* Avatar */}
+                      <h2
+                        className="
+                          mt-1
+                          truncate
+
+                          text-lg
+                          font-extrabold
+                          tracking-[-0.025em]
+
+                          text-[#2F3136]
+
+                          sm:text-xl
+                        "
+                      >
+                        {getUserName(
+                          selectedUser
+                        )}
+                      </h2>
 
                       <div
                         className="
-                          w-12
-                          h-12
+                          mt-2
 
-                          shrink-0
-
-                          rounded-xl
-
-                          overflow-hidden
-
-                          bg-purple-100
+                          flex
+                          flex-wrap
+                          items-center
+                          gap-2
                         "
                       >
-                        {getUserImage(
-                          user
-                        ) ? (
-                          <img
-                            src={getUserImage(
-                              user
-                            )}
-                            alt={getUserName(
-                              user
-                            )}
-                            className="
-                              w-full
-                              h-full
-                              object-cover
-                            "
-                          />
-                        ) : (
-                          <div
-                            className="
-                              w-full
-                              h-full
+                        <span
+                          className={`
+                            rounded-full
 
-                              flex
-                              items-center
-                              justify-center
+                            border
 
-                              font-bold
-                              text-purple-700
-                            "
-                          >
-                            {getInitials(
-                              user
-                            )}
-                          </div>
-                        )}
-                      </div>
+                            px-2.5
+                            py-1
 
-                      <div className="min-w-0">
-
-                        <h3
-                          className="
+                            text-[9px]
                             font-bold
-                            text-[#393E46]
+                            capitalize
 
-                            truncate
-                          "
+                            ${getRoleStyle(
+                              getUserRole(
+                                selectedUser
+                              )
+                            )}
+                          `}
                         >
-                          {getUserName(
-                            user
+                          {getUserRole(
+                            selectedUser
                           )}
-                        </h3>
+                        </span>
 
-                        <p
-                          className="
-                            text-sm
-                            text-gray-500
+                        <span
+                          className={`
+                            rounded-full
 
-                            truncate
-                          "
+                            border
+
+                            px-2.5
+                            py-1
+
+                            text-[9px]
+                            font-bold
+
+                            ${getStatusStyle(
+                              selectedUser.isBlock
+                            )}
+                          `}
                         >
-                          {user.email}
-                        </p>
-
+                          {selectedUser.isBlock
+                            ? "Blocked"
+                            : "Access Enabled"}
+                        </span>
                       </div>
-
                     </div>
-
-                    <span
-                      className={`
-                        shrink-0
-
-                        px-2.5
-                        py-1
-
-                        rounded-full
-
-                        text-[10px]
-                        font-bold
-
-                        ${
-                          user.isBlock
-                            ? "bg-red-100 text-red-700"
-                            : "bg-green-100 text-green-700"
-                        }
-                      `}
-                    >
-                      {user.isBlock
-                        ? "Blocked"
-                        : "Active"}
-                    </span>
-
                   </div>
 
-                  {/* Bottom */}
+                  <button
+                    type="button"
+                    aria-label="Close account details"
+                    onClick={() =>
+                      setSelectedUser(
+                        null
+                      )
+                    }
+                    className="
+                      flex
+                      h-10
+                      w-10
+                      shrink-0
+                      items-center
+                      justify-center
 
+                      rounded-full
+
+                      border
+                      border-[#E8E2EC]
+
+                      bg-[#FAF8FB]
+
+                      text-[#77707C]
+
+                      transition-all
+
+                      hover:border-[#E7C6CE]
+                      hover:bg-[#FFF2F4]
+                      hover:text-[#B65566]
+
+                      active:scale-90
+                    "
+                  >
+                    <CloseIcon />
+                  </button>
+                </div>
+              </div>
+
+              {/* CONTENT */}
+
+              <div
+                className="
+                  space-y-5
+
+                  p-4
+
+                  sm:p-6
+                "
+              >
+                {/* ACCOUNT SUMMARY */}
+
+                <div
+                  className="
+                    relative
+                    overflow-hidden
+
+                    rounded-[22px]
+
+                    border
+                    border-[#E5DDF1]
+
+                    bg-gradient-to-br
+                    from-[#F7F4FF]
+                    via-white
+                    to-[#FFF5F8]
+
+                    p-5
+                  "
+                >
+                  <div
+                    className="
+                      pointer-events-none
+
+                      absolute
+                      -right-14
+                      -top-14
+
+                      h-36
+                      w-36
+
+                      rounded-full
+
+                      bg-[#B8A1FF]/16
+
+                      blur-3xl
+                    "
+                  />
+
+                  <div
+                    className="
+                      relative
+
+                      flex
+                      items-center
+                      gap-3
+                    "
+                  >
+                    <div
+                      className="
+                        flex
+                        h-11
+                        w-11
+                        shrink-0
+                        items-center
+                        justify-center
+
+                        rounded-2xl
+
+                        bg-[#F2EDFF]
+
+                        text-[#6C5CE7]
+                      "
+                    >
+                      <ShieldIcon />
+                    </div>
+
+                    <div>
+                      <p
+                        className="
+                          text-[9px]
+                          font-black
+                          uppercase
+                          tracking-[0.15em]
+
+                          text-[#927CE4]
+                        "
+                      >
+                        Access
+                        Management
+                      </p>
+
+                      <p
+                        className="
+                          mt-1
+                          text-sm
+                          font-extrabold
+                          text-[#39333E]
+                        "
+                      >
+                        {selectedUser.isBlock
+                          ? "Account access is currently restricted."
+                          : "Account access is currently enabled."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* DETAILS */}
+
+                <div
+                  className="
+                    grid
+                    grid-cols-1
+                    gap-3
+
+                    sm:grid-cols-2
+                  "
+                >
+                  <DetailCard
+                    title="Full Name"
+                    value={getUserName(
+                      selectedUser
+                    )}
+                  />
+
+                  <DetailCard
+                    title="Account Role"
+                    value={getUserRole(
+                      selectedUser
+                    )}
+                  />
+
+                  <DetailCard
+                    title="Email Address"
+                    value={
+                      selectedUser.email ||
+                      "-"
+                    }
+                    buttonText="Copy"
+                    onButtonClick={() =>
+                      copyText(
+                        selectedUser.email ||
+                          "",
+                        "Email copied"
+                      )
+                    }
+                  />
+
+                  {/* ID intentionally only in modal */}
+
+                  <DetailCard
+                    title="Internal User ID"
+                    value={getUserId(
+                      selectedUser
+                    )}
+                    buttonText="Copy"
+                    onButtonClick={() =>
+                      copyText(
+                        getUserId(
+                          selectedUser
+                        ),
+                        "User ID copied"
+                      )
+                    }
+                  />
+                </div>
+
+                {/* ACCESS CONTROL */}
+
+                <section
+                  className="
+                    rounded-[22px]
+
+                    border
+                    border-[#E8E1EF]
+
+                    bg-white
+
+                    p-4
+
+                    shadow-[0_8px_25px_rgba(63,48,84,0.035)]
+
+                    sm:p-5
+                  "
+                >
                   <div
                     className="
                       flex
                       flex-col
-                      sm:flex-row
+                      gap-4
 
+                      sm:flex-row
                       sm:items-center
                       sm:justify-between
-
-                      gap-3
-
-                      mt-4
-                      pt-3
-
-                      border-t
-                      border-gray-100
                     "
                   >
+                    <div>
+                      <p
+                        className="
+                          text-[9px]
+                          font-black
+                          uppercase
+                          tracking-[0.16em]
 
-                    <span
-                      className={`
-                        self-start
+                          text-[#927CE4]
+                        "
+                      >
+                        Account
+                        Security
+                      </p>
 
-                        px-3
-                        py-1
+                      <h3
+                        className="
+                          mt-1
 
-                        rounded-full
+                          font-extrabold
+                          text-[#39333E]
+                        "
+                      >
+                        Access
+                        Status
+                      </h3>
 
-                        border
+                      <div
+                        className="
+                          mt-2
 
-                        text-xs
-                        font-bold
-                        capitalize
+                          flex
+                          items-center
+                          gap-2
+                        "
+                      >
+                        <span
+                          className={`
+                            h-2.5
+                            w-2.5
 
-                        ${getRoleStyle(
-                          getUserRole(
-                            user
-                          )
-                        )}
-                      `}
-                    >
-                      {getUserRole(
-                        user
-                      )}
-                    </span>
+                            rounded-full
 
-                    {/* Block button */}
+                            ${
+                              selectedUser.isBlock
+                                ? "bg-[#D95C5C]"
+                                : "bg-[#4F9D7A]"
+                            }
+                          `}
+                        />
+
+                        <span
+                          className="
+                            text-sm
+                            font-semibold
+                            text-[#625B67]
+                          "
+                        >
+                          {selectedUser.isBlock
+                            ? "Blocked"
+                            : "Access Enabled"}
+                        </span>
+                      </div>
+                    </div>
 
                     <button
                       type="button"
                       disabled={
                         updatingUserId ===
                         getUserId(
-                          user
+                          selectedUser
                         )
                       }
-                      onClick={(e) => {
-                        e.stopPropagation();
-
+                      onClick={() =>
                         toggleBlockUser(
-                          user
-                        );
-                      }}
+                          selectedUser
+                        )
+                      }
                       className={`
+                        flex
+                        min-h-[46px]
                         w-full
-                        sm:w-auto
+                        items-center
+                        justify-center
+                        gap-2
+
+                        rounded-xl
+
+                        border
 
                         px-4
-                        py-2
-
-                        rounded-lg
 
                         text-xs
                         font-bold
 
-                        active:scale-95
-
-                        disabled:opacity-50
-
                         transition-all
 
+                        active:scale-[0.98]
+
+                        disabled:cursor-not-allowed
+                        disabled:opacity-50
+
+                        sm:w-auto
+
                         ${
-                          user.isBlock
-                            ? `
-                              bg-green-100
-                              text-green-700
-                              hover:bg-green-600
-                              hover:text-white
-                            `
-                            : `
-                              bg-red-100
-                              text-red-700
-                              hover:bg-red-600
-                              hover:text-white
-                            `
+                          selectedUser.isBlock
+                            ? "border-[#D1E6DA] bg-[#EDF7F2] text-[#478465] hover:bg-[#4F9D7A] hover:text-white"
+                            : "border-[#F0D4D9] bg-[#FFF1F3] text-[#B45462] hover:bg-[#B45462] hover:text-white"
                         }
                       `}
                     >
                       {updatingUserId ===
                       getUserId(
-                        user
-                      )
-                        ? "Updating..."
-                        : user.isBlock
-                        ? "Unblock User"
-                        : "Block User"}
+                        selectedUser
+                      ) ? (
+                        <>
+                          <span
+                            className="
+                              h-4
+                              w-4
+                              animate-spin
+
+                              rounded-full
+
+                              border-2
+                              border-current/25
+                              border-t-current
+                            "
+                          />
+
+                          Updating...
+                        </>
+                      ) : selectedUser.isBlock ? (
+                        <>
+                          <UnlockIcon />
+
+                          Restore Access
+                        </>
+                      ) : (
+                        <>
+                          <LockIcon />
+
+                          Block Account
+                        </>
+                      )}
                     </button>
-
                   </div>
+                </section>
+              </div>
 
-                </div>
+              {/* FOOTER */}
 
-                {/* =============================
-                    DESKTOP
-                ============================= */}
+              <div
+                className="
+                  border-t
+                  border-[#EEE9F2]
 
-                <div
+                  bg-[#FCFAFD]
+
+                  px-4
+                  py-4
+
+                  text-center
+
+                  sm:px-6
+                "
+              >
+                <p
                   className="
-                    hidden
-                    xl:grid
+                    text-[9px]
+                    font-semibold
+                    uppercase
+                    tracking-[0.13em]
 
-                    grid-cols-[1.2fr_1.5fr_120px_120px_150px_45px]
-
-                    gap-4
-
-                    px-6
-                    py-5
-
-                    items-center
+                    text-[#A39BA6]
                   "
                 >
-
-                  {/* User */}
-
-                  <div
-                    className="
-                      flex
-                      items-center
-                      gap-3
-
-                      min-w-0
-                    "
-                  >
-
-                    <div
-                      className="
-                        w-10
-                        h-10
-
-                        shrink-0
-
-                        rounded-xl
-
-                        overflow-hidden
-
-                        bg-purple-100
-                      "
-                    >
-                      {getUserImage(
-                        user
-                      ) ? (
-                        <img
-                          src={getUserImage(
-                            user
-                          )}
-                          alt=""
-                          className="
-                            w-full
-                            h-full
-                            object-cover
-                          "
-                        />
-                      ) : (
-                        <div
-                          className="
-                            w-full
-                            h-full
-
-                            flex
-                            items-center
-                            justify-center
-
-                            text-xs
-                            font-bold
-                            text-purple-700
-                          "
-                        >
-                          {getInitials(
-                            user
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    <p
-                      className="
-                        text-sm
-                        font-semibold
-                        text-[#393E46]
-
-                        truncate
-                      "
-                    >
-                      {getUserName(
-                        user
-                      )}
-                    </p>
-
-                  </div>
-
-                  {/* Email */}
-
-                  <p
-                    className="
-                      text-sm
-                      text-gray-500
-
-                      truncate
-                    "
-                  >
-                    {user.email}
-                  </p>
-
-                  {/* Role */}
-
-                  <div>
-
-                    <span
-                      className={`
-                        px-3
-                        py-1
-
-                        rounded-full
-
-                        border
-
-                        text-xs
-                        font-bold
-                        capitalize
-
-                        ${getRoleStyle(
-                          getUserRole(
-                            user
-                          )
-                        )}
-                      `}
-                    >
-                      {getUserRole(
-                        user
-                      )}
-                    </span>
-
-                  </div>
-
-                  {/* Status */}
-
-                  <div
-                    className="
-                      flex
-                      items-center
-                      gap-2
-                    "
-                  >
-
-                    <span
-                      className={`
-                        w-2
-                        h-2
-
-                        rounded-full
-
-                        ${
-                          user.isBlock
-                            ? "bg-red-500"
-                            : "bg-green-500"
-                        }
-                      `}
-                    />
-
-                    <span
-                      className="
-                        text-xs
-                        font-semibold
-                      "
-                    >
-                      {user.isBlock
-                        ? "Blocked"
-                        : "Active"}
-                    </span>
-
-                  </div>
-
-                  {/* Button */}
-
-                  <button
-                    type="button"
-                    disabled={
-                      updatingUserId ===
-                      getUserId(
-                        user
-                      )
-                    }
-                    onClick={(e) => {
-                      e.stopPropagation();
-
-                      toggleBlockUser(
-                        user
-                      );
-                    }}
-                    className={`
-                      px-4
-                      py-2
-
-                      rounded-lg
-
-                      text-xs
-                      font-bold
-
-                      active:scale-95
-
-                      transition-all
-
-                      disabled:opacity-50
-
-                      ${
-                        user.isBlock
-                          ? `
-                            bg-green-100
-                            text-green-700
-                            hover:bg-green-600
-                            hover:text-white
-                          `
-                          : `
-                            bg-red-100
-                            text-red-700
-                            hover:bg-red-600
-                            hover:text-white
-                          `
-                      }
-                    `}
-                  >
-                    {updatingUserId ===
-                    getUserId(
-                      user
-                    )
-                      ? "Updating..."
-                      : user.isBlock
-                      ? "Unblock"
-                      : "Block"}
-                  </button>
-
-                  {/* Arrow */}
-
-                  <svg
-                    className="
-                      w-5
-                      h-5
-
-                      text-gray-300
-
-                      group-hover:text-purple-600
-                      group-hover:translate-x-1
-
-                      transition-all
-                    "
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-
-                </div>
-
+                  Velmora Account
+                  Administration
+                </p>
               </div>
-            )
-          )}
-
-        </div>
-
-        {/* Empty */}
-
-        {filteredUsers.length === 0 && (
-          <div
-            className="
-              py-16
-
-              px-5
-
-              text-center
-            "
-          >
-            <h3
-              className="
-                text-lg
-                font-bold
-                text-[#393E46]
-              "
-            >
-              No users found
-            </h3>
-
-            <p
-              className="
-                text-sm
-                text-gray-400
-
-                mt-1
-              "
-            >
-              Try changing the search or filters.
-            </p>
+            </div>
           </div>
         )}
 
-      </div>
+        {/* =================================================
+            HERO
+        ================================================= */}
 
-      <style>
-        {`
-          @keyframes pageEnter {
+        <section
+          className="
+            relative
+
+            mb-5
+
+            overflow-hidden
+
+            rounded-[26px]
+
+            border
+            border-[#E9E2F0]
+
+            bg-gradient-to-r
+            from-[#F5F1FF]
+            via-white
+            to-[#FFF3F7]
+
+            p-5
+
+            shadow-[0_16px_50px_rgba(63,48,84,0.05)]
+
+            sm:mb-6
+            sm:rounded-[30px]
+            sm:p-6
+          "
+        >
+          <div
+            className="
+              pointer-events-none
+
+              absolute
+              -right-20
+              -top-20
+
+              h-52
+              w-52
+
+              rounded-full
+
+              bg-[#B8A1FF]/14
+
+              blur-3xl
+            "
+          />
+
+          <div
+            className="
+              pointer-events-none
+
+              absolute
+              -bottom-24
+              left-[35%]
+
+              h-44
+              w-44
+
+              rounded-full
+
+              bg-[#F2B8C6]/10
+
+              blur-3xl
+            "
+          />
+
+          <div
+            className="
+              relative
+
+              flex
+              flex-col
+              gap-5
+
+              sm:flex-row
+              sm:items-center
+              sm:justify-between
+            "
+          >
+            <div>
+              <div
+                className="
+                  inline-flex
+                  items-center
+                  gap-2
+
+                  rounded-full
+
+                  border
+                  border-[#DED5F4]
+
+                  bg-white/75
+
+                  px-3
+                  py-1.5
+
+                  text-[9px]
+                  font-black
+                  uppercase
+                  tracking-[0.18em]
+
+                  text-[#6C5CE7]
+
+                  sm:text-[10px]
+                "
+              >
+                <span className="text-[#B9955B]">
+                  ✦
+                </span>
+
+                Velmora
+                Customer
+                Management
+              </div>
+
+              <h1
+                className="
+                  mt-3
+
+                  text-2xl
+                  font-extrabold
+                  tracking-[-0.04em]
+
+                  text-[#2F3136]
+
+                  sm:text-3xl
+
+                  lg:text-[34px]
+                "
+              >
+                Customer
+                Accounts
+              </h1>
+
+              <p
+                className="
+                  mt-2
+
+                  max-w-2xl
+
+                  text-xs
+                  leading-6
+
+                  text-[#78717D]
+
+                  sm:text-sm
+                "
+              >
+                Review Velmora
+                customer and
+                administrator
+                accounts,
+                manage access
+                permissions and
+                maintain a
+                secure shopping
+                community.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={
+                refreshUsers
+              }
+              disabled={
+                isRefreshing
+              }
+              className="
+                group
+
+                flex
+                min-h-[46px]
+                w-full
+                items-center
+                justify-center
+                gap-2
+
+                rounded-xl
+
+                border
+                border-[#DAD1EC]
+
+                bg-white
+
+                px-4
+
+                text-sm
+                font-bold
+                text-[#625A68]
+
+                shadow-sm
+
+                transition-all
+                duration-300
+
+                hover:-translate-y-0.5
+                hover:border-[#C8B9F2]
+                hover:text-[#6C5CE7]
+                hover:shadow-md
+
+                disabled:cursor-not-allowed
+                disabled:opacity-50
+
+                sm:w-auto
+              "
+            >
+              <span
+                className={`
+                  ${
+                    isRefreshing
+                      ? "animate-spin"
+                      : "transition-transform duration-500 group-hover:rotate-180"
+                  }
+                `}
+              >
+                <RefreshIcon />
+              </span>
+
+              {isRefreshing
+                ? "Refreshing..."
+                : "Refresh Accounts"}
+            </button>
+          </div>
+        </section>
+
+        {/* =================================================
+            STATS
+        ================================================= */}
+
+        <section
+          className="
+            mb-5
+
+            grid
+            grid-cols-2
+            gap-3
+
+            lg:grid-cols-4
+            lg:gap-4
+          "
+        >
+          <UserStatCard
+            title="Total Accounts"
+            value={
+              users.length
+            }
+            type="total"
+          />
+
+          <UserStatCard
+            title="Access Enabled"
+            value={
+              accessEnabledUsers
+            }
+            type="enabled"
+          />
+
+          <UserStatCard
+            title="Blocked"
+            value={
+              blockedUsers
+            }
+            type="blocked"
+          />
+
+          <UserStatCard
+            title="Administrators"
+            value={
+              adminUsers
+            }
+            type="admin"
+          />
+        </section>
+
+        {/* =================================================
+            ACCOUNT MIX
+        ================================================= */}
+
+        <div
+          className="
+            mb-5
+
+            flex
+            flex-col
+            gap-3
+
+            rounded-[20px]
+
+            border
+            border-[#E7E0EC]
+
+            bg-white
+
+            px-4
+            py-3.5
+
+            shadow-[0_9px_28px_rgba(63,48,84,0.03)]
+
+            sm:flex-row
+            sm:items-center
+            sm:justify-between
+          "
+        >
+          <div>
+            <p
+              className="
+                text-[9px]
+                font-black
+                uppercase
+                tracking-[0.16em]
+
+                text-[#927CE4]
+              "
+            >
+              Account Mix
+            </p>
+
+            <p
+              className="
+                mt-1
+                text-xs
+                text-[#817A85]
+              "
+            >
+              {
+                customerUsers
+              }{" "}
+              customer
+              {customerUsers ===
+              1
+                ? ""
+                : "s"}{" "}
+              and{" "}
+              {
+                adminUsers
+              }{" "}
+              administrator
+              {adminUsers === 1
+                ? ""
+                : "s"}{" "}
+              are registered.
+            </p>
+          </div>
+
+          <span
+            className="
+              self-start
+
+              rounded-full
+
+              border
+              border-[#DFD6F1]
+
+              bg-[#F6F2FF]
+
+              px-3
+              py-1.5
+
+              text-[9px]
+              font-bold
+              uppercase
+              tracking-[0.11em]
+
+              text-[#6C5CE7]
+
+              sm:self-auto
+            "
+          >
+            Velmora Community
+          </span>
+        </div>
+
+        {/* =================================================
+            FILTERS
+        ================================================= */}
+
+        <section
+          className="
+            mb-5
+
+            rounded-[24px]
+
+            border
+            border-[#E9E3EF]
+
+            bg-white
+
+            p-4
+
+            shadow-[0_12px_38px_rgba(63,48,84,0.04)]
+
+            sm:p-5
+          "
+        >
+          <div
+            className="
+              grid
+              grid-cols-1
+              gap-3
+
+              md:grid-cols-[minmax(0,1fr)_180px_190px]
+            "
+          >
+            {/* SEARCH */}
+
+            <div className="relative">
+              <div
+                className="
+                  pointer-events-none
+
+                  absolute
+                  left-3
+                  top-1/2
+
+                  flex
+                  h-9
+                  w-9
+                  -translate-y-1/2
+                  items-center
+                  justify-center
+
+                  rounded-xl
+
+                  bg-[#F2EDFF]
+
+                  text-[#6C5CE7]
+                "
+              >
+                <SearchIcon />
+              </div>
+
+              <input
+                type="text"
+                value={search}
+                onChange={(
+                  event
+                ) =>
+                  setSearch(
+                    event.target
+                      .value
+                  )
+                }
+                placeholder="Search name, email or internal user ID..."
+                className="
+                  min-h-[52px]
+                  w-full
+
+                  rounded-2xl
+
+                  border
+                  border-[#DDD7E2]
+
+                  bg-white
+
+                  pl-[58px]
+                  pr-12
+
+                  text-sm
+                  text-[#39333E]
+
+                  outline-none
+
+                  transition-all
+                  duration-300
+
+                  placeholder:text-[#AAA3AF]
+
+                  hover:border-[#CFC5D8]
+
+                  focus:border-[#B8A1FF]
+                  focus:ring-4
+                  focus:ring-[#B8A1FF]/15
+                "
+              />
+
+              {search && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSearch("")
+                  }
+                  aria-label="Clear search"
+                  className="
+                    absolute
+                    right-3
+                    top-1/2
+
+                    flex
+                    h-8
+                    w-8
+                    -translate-y-1/2
+                    items-center
+                    justify-center
+
+                    rounded-full
+
+                    text-[#9A929E]
+
+                    transition-colors
+
+                    hover:bg-[#F2EDFF]
+                    hover:text-[#6C5CE7]
+                  "
+                >
+                  <CloseIcon />
+                </button>
+              )}
+            </div>
+
+            {/* ROLE */}
+
+            <select
+              value={
+                roleFilter
+              }
+              onChange={(
+                event
+              ) =>
+                setRoleFilter(
+                  event.target
+                    .value
+                )
+              }
+              className="
+                min-h-[52px]
+                w-full
+
+                rounded-2xl
+
+                border
+                border-[#DDD7E2]
+
+                bg-white
+
+                px-4
+
+                text-sm
+                font-semibold
+                text-[#625B67]
+
+                outline-none
+
+                transition-all
+
+                focus:border-[#B8A1FF]
+                focus:ring-4
+                focus:ring-[#B8A1FF]/15
+              "
+            >
+              <option value="all">
+                All Roles
+              </option>
+
+              <option value="customer">
+                Customers
+              </option>
+
+              <option value="admin">
+                Administrators
+              </option>
+            </select>
+
+            {/* STATUS */}
+
+            <select
+              value={
+                statusFilter
+              }
+              onChange={(
+                event
+              ) =>
+                setStatusFilter(
+                  event.target
+                    .value
+                )
+              }
+              className="
+                min-h-[52px]
+                w-full
+
+                rounded-2xl
+
+                border
+                border-[#DDD7E2]
+
+                bg-white
+
+                px-4
+
+                text-sm
+                font-semibold
+                text-[#625B67]
+
+                outline-none
+
+                transition-all
+
+                focus:border-[#B8A1FF]
+                focus:ring-4
+                focus:ring-[#B8A1FF]/15
+              "
+            >
+              <option value="all">
+                All Access
+              </option>
+
+              <option value="enabled">
+                Access Enabled
+              </option>
+
+              <option value="blocked">
+                Blocked
+              </option>
+            </select>
+          </div>
+
+          <div
+            className="
+              mt-3
+
+              flex
+              flex-col
+              gap-2
+
+              sm:flex-row
+              sm:items-center
+              sm:justify-between
+            "
+          >
+            <p
+              className="
+                text-[10px]
+                text-[#99919D]
+
+                sm:text-xs
+              "
+            >
+              Showing{" "}
+              <span
+                className="
+                  font-bold
+                  text-[#6C5CE7]
+                "
+              >
+                {
+                  filteredUsers.length
+                }
+              </span>{" "}
+              of{" "}
+              {
+                users.length
+              }{" "}
+              Velmora accounts
+            </p>
+
+            {(search ||
+              roleFilter !==
+                "all" ||
+              statusFilter !==
+                "all") && (
+              <button
+                type="button"
+                onClick={
+                  clearFilters
+                }
+                className="
+                  self-start
+
+                  text-xs
+                  font-bold
+                  text-[#6C5CE7]
+
+                  transition-colors
+
+                  hover:text-[#5544C5]
+                  hover:underline
+
+                  sm:self-auto
+                "
+              >
+                Clear Filters
+              </button>
+            )}
+          </div>
+        </section>
+
+        {/* =================================================
+            USER LIST
+        ================================================= */}
+
+        <section
+          className="
+            overflow-hidden
+
+            rounded-[26px]
+
+            border
+            border-[#E9E3EF]
+
+            bg-white
+
+            shadow-[0_15px_48px_rgba(63,48,84,0.045)]
+          "
+        >
+          {/* HEADER */}
+
+          <div
+            className="
+              flex
+              items-center
+              justify-between
+              gap-3
+
+              border-b
+              border-[#EEE9F2]
+
+              px-4
+              py-4
+
+              sm:px-6
+              sm:py-5
+            "
+          >
+            <div>
+              <p
+                className="
+                  text-[9px]
+                  font-black
+                  uppercase
+                  tracking-[0.17em]
+
+                  text-[#927CE4]
+                "
+              >
+                Velmora
+                Community
+              </p>
+
+              <h2
+                className="
+                  mt-1
+
+                  text-base
+                  font-extrabold
+                  text-[#2F3136]
+
+                  sm:text-lg
+                "
+              >
+                Customer &
+                Admin Accounts
+              </h2>
+
+              <p
+                className="
+                  mt-1
+
+                  text-[10px]
+                  text-[#99919D]
+
+                  sm:text-xs
+                "
+              >
+                Select an
+                account to
+                inspect complete
+                information and
+                manage access.
+              </p>
+            </div>
+
+            <span
+              className="
+                flex
+                h-9
+                min-w-[38px]
+                items-center
+                justify-center
+
+                rounded-full
+
+                border
+                border-[#E0D7F3]
+
+                bg-[#F5F1FF]
+
+                px-3
+
+                text-xs
+                font-bold
+                text-[#6C5CE7]
+              "
+            >
+              {
+                filteredUsers.length
+              }
+            </span>
+          </div>
+
+          {/* DESKTOP HEADER */}
+
+          <div
+            className="
+              hidden
+
+              grid-cols-[1.2fr_1.5fr_125px_145px_160px_40px]
+              gap-4
+
+              border-b
+              border-[#EAE4EE]
+
+              bg-[#F8F5FB]
+
+              px-6
+              py-4
+
+              text-[10px]
+              font-black
+              uppercase
+              tracking-[0.08em]
+              text-[#827A87]
+
+              xl:grid
+            "
+          >
+            <div>
+              Account
+            </div>
+
+            <div>
+              Email
+            </div>
+
+            <div>
+              Role
+            </div>
+
+            <div>
+              Access
+            </div>
+
+            <div>
+              Action
+            </div>
+
+            <div />
+          </div>
+
+          {/* USERS */}
+
+          <div
+            className="
+              divide-y
+              divide-[#F0EBF3]
+            "
+          >
+            {filteredUsers.map(
+              (user) => {
+                const userId =
+                  getUserId(
+                    user
+                  );
+
+                return (
+                  <article
+                    key={
+                      userId
+                    }
+                    onClick={() =>
+                      setSelectedUser(
+                        user
+                      )
+                    }
+                    className="
+                      group
+
+                      cursor-pointer
+
+                      transition-all
+                      duration-200
+
+                      hover:bg-[#FCFAFD]
+                    "
+                  >
+                    {/* =================================
+                        MOBILE / TABLET
+                    ================================= */}
+
+                    <div
+                      className="
+                        p-4
+
+                        sm:p-5
+
+                        xl:hidden
+                      "
+                    >
+                      {/* TOP */}
+
+                      <div
+                        className="
+                          flex
+                          items-start
+                          justify-between
+                          gap-3
+                        "
+                      >
+                        <div
+                          className="
+                            flex
+                            min-w-0
+                            items-center
+                            gap-3
+                          "
+                        >
+                          <UserAvatar
+                            user={user}
+                            getUserImage={
+                              getUserImage
+                            }
+                            getInitials={
+                              getInitials
+                            }
+                            getUserName={
+                              getUserName
+                            }
+                          />
+
+                          <div className="min-w-0">
+                            <h3
+                              className="
+                                truncate
+
+                                font-extrabold
+                                text-[#39333E]
+                              "
+                            >
+                              {getUserName(
+                                user
+                              )}
+                            </h3>
+
+                            <p
+                              className="
+                                mt-1
+                                truncate
+
+                                text-sm
+                                text-[#817A85]
+                              "
+                            >
+                              {user.email ||
+                                "-"}
+                            </p>
+                          </div>
+                        </div>
+
+                        <span
+                          className={`
+                            shrink-0
+
+                            rounded-full
+
+                            border
+
+                            px-2.5
+                            py-1
+
+                            text-[9px]
+                            font-bold
+
+                            ${getStatusStyle(
+                              user.isBlock
+                            )}
+                          `}
+                        >
+                          {user.isBlock
+                            ? "Blocked"
+                            : "Enabled"}
+                        </span>
+                      </div>
+
+                      {/* ROLE + ACCESS */}
+
+                      <div
+                        className="
+                          mt-4
+
+                          flex
+                          flex-col
+                          gap-3
+
+                          border-t
+                          border-[#EEE9F2]
+
+                          pt-3
+
+                          sm:flex-row
+                          sm:items-center
+                          sm:justify-between
+                        "
+                      >
+                        <span
+                          className={`
+                            self-start
+
+                            rounded-full
+
+                            border
+
+                            px-3
+                            py-1.5
+
+                            text-[10px]
+                            font-bold
+                            capitalize
+
+                            ${getRoleStyle(
+                              getUserRole(
+                                user
+                              )
+                            )}
+                          `}
+                        >
+                          {getUserRole(
+                            user
+                          )}
+                        </span>
+
+                        <div
+                          className="
+                            flex
+                            w-full
+                            gap-2
+
+                            sm:w-auto
+                          "
+                        >
+                          <button
+                            type="button"
+                            onClick={(
+                              event
+                            ) => {
+                              event.stopPropagation();
+
+                              setSelectedUser(
+                                user
+                              );
+                            }}
+                            className="
+                              flex
+                              min-h-[42px]
+                              flex-1
+                              items-center
+                              justify-center
+                              gap-2
+
+                              rounded-xl
+
+                              border
+                              border-[#DDD5F2]
+
+                              bg-[#F4F0FF]
+
+                              px-4
+
+                              text-xs
+                              font-bold
+                              text-[#6C5CE7]
+
+                              transition-all
+
+                              hover:bg-[#ECE5FF]
+
+                              sm:flex-none
+                            "
+                          >
+                            Details
+                          </button>
+
+                          <button
+                            type="button"
+                            disabled={
+                              updatingUserId ===
+                              userId
+                            }
+                            onClick={(
+                              event
+                            ) => {
+                              event.stopPropagation();
+
+                              toggleBlockUser(
+                                user
+                              );
+                            }}
+                            className={`
+                              flex
+                              min-h-[42px]
+                              flex-1
+                              items-center
+                              justify-center
+                              gap-2
+
+                              rounded-xl
+
+                              border
+
+                              px-4
+
+                              text-xs
+                              font-bold
+
+                              transition-all
+
+                              active:scale-[0.98]
+
+                              disabled:cursor-not-allowed
+                              disabled:opacity-50
+
+                              sm:flex-none
+
+                              ${
+                                user.isBlock
+                                  ? "border-[#D5E9DF] bg-[#EDF7F2] text-[#478465] hover:bg-[#4F9D7A] hover:text-white"
+                                  : "border-[#F0D6DB] bg-[#FFF3F5] text-[#B45462] hover:bg-[#B45462] hover:text-white"
+                              }
+                            `}
+                          >
+                            {updatingUserId ===
+                            userId ? (
+                              <>
+                                <span
+                                  className="
+                                    h-4
+                                    w-4
+                                    animate-spin
+
+                                    rounded-full
+
+                                    border-2
+                                    border-current/30
+                                    border-t-current
+                                  "
+                                />
+
+                                Updating
+                              </>
+                            ) : user.isBlock ? (
+                              <>
+                                <UnlockIcon />
+
+                                Restore
+                              </>
+                            ) : (
+                              <>
+                                <LockIcon />
+
+                                Block
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* =================================
+                        DESKTOP
+                    ================================= */}
+
+                    <div
+                      className="
+                        hidden
+
+                        grid-cols-[1.2fr_1.5fr_125px_145px_160px_40px]
+                        items-center
+                        gap-4
+
+                        px-6
+                        py-5
+
+                        xl:grid
+                      "
+                    >
+                      {/* USER */}
+
+                      <div
+                        className="
+                          flex
+                          min-w-0
+                          items-center
+                          gap-3
+                        "
+                      >
+                        <UserAvatar
+                          user={user}
+                          size="small"
+                          getUserImage={
+                            getUserImage
+                          }
+                          getInitials={
+                            getInitials
+                          }
+                          getUserName={
+                            getUserName
+                          }
+                        />
+
+                        <p
+                          className="
+                            truncate
+
+                            text-sm
+                            font-bold
+                            text-[#39333E]
+                          "
+                        >
+                          {getUserName(
+                            user
+                          )}
+                        </p>
+                      </div>
+
+                      {/* EMAIL */}
+
+                      <p
+                        className="
+                          truncate
+
+                          text-sm
+                          text-[#69626E]
+                        "
+                        title={
+                          user.email
+                        }
+                      >
+                        {user.email ||
+                          "-"}
+                      </p>
+
+                      {/* ROLE */}
+
+                      <div>
+                        <span
+                          className={`
+                            inline-flex
+
+                            rounded-full
+
+                            border
+
+                            px-3
+                            py-1.5
+
+                            text-[10px]
+                            font-bold
+                            capitalize
+
+                            ${getRoleStyle(
+                              getUserRole(
+                                user
+                              )
+                            )}
+                          `}
+                        >
+                          {getUserRole(
+                            user
+                          )}
+                        </span>
+                      </div>
+
+                      {/* ACCESS */}
+
+                      <div
+                        className="
+                          flex
+                          items-center
+                          gap-2
+                        "
+                      >
+                        <span
+                          className={`
+                            h-2
+                            w-2
+
+                            rounded-full
+
+                            ${
+                              user.isBlock
+                                ? "bg-[#D95C5C]"
+                                : "bg-[#4F9D7A]"
+                            }
+                          `}
+                        />
+
+                        <span
+                          className="
+                            text-xs
+                            font-semibold
+                            text-[#625B67]
+                          "
+                        >
+                          {user.isBlock
+                            ? "Blocked"
+                            : "Enabled"}
+                        </span>
+                      </div>
+
+                      {/* ACTION */}
+
+                      <button
+                        type="button"
+                        disabled={
+                          updatingUserId ===
+                          userId
+                        }
+                        onClick={(
+                          event
+                        ) => {
+                          event.stopPropagation();
+
+                          toggleBlockUser(
+                            user
+                          );
+                        }}
+                        className={`
+                          flex
+                          min-h-[38px]
+                          items-center
+                          justify-center
+                          gap-1.5
+
+                          rounded-xl
+
+                          border
+
+                          px-3
+
+                          text-[10px]
+                          font-bold
+
+                          transition-all
+
+                          disabled:cursor-not-allowed
+                          disabled:opacity-50
+
+                          ${
+                            user.isBlock
+                              ? "border-[#D5E9DF] bg-[#EDF7F2] text-[#478465] hover:bg-[#4F9D7A] hover:text-white"
+                              : "border-[#F0D6DB] bg-[#FFF3F5] text-[#B45462] hover:bg-[#B45462] hover:text-white"
+                          }
+                        `}
+                      >
+                        {updatingUserId ===
+                        userId ? (
+                          <>
+                            <span
+                              className="
+                                h-3.5
+                                w-3.5
+                                animate-spin
+
+                                rounded-full
+
+                                border-2
+                                border-current/30
+                                border-t-current
+                              "
+                            />
+
+                            Updating
+                          </>
+                        ) : user.isBlock ? (
+                          <>
+                            <UnlockIcon />
+
+                            Restore
+                          </>
+                        ) : (
+                          <>
+                            <LockIcon />
+
+                            Block
+                          </>
+                        )}
+                      </button>
+
+                      {/* ARROW */}
+
+                      <div
+                        className="
+                          flex
+                          h-9
+                          w-9
+                          items-center
+                          justify-center
+
+                          rounded-full
+
+                          text-[#C1BAC5]
+
+                          transition-all
+
+                          group-hover:translate-x-1
+                          group-hover:bg-[#F2EDFF]
+                          group-hover:text-[#6C5CE7]
+                        "
+                      >
+                        <ArrowIcon />
+                      </div>
+                    </div>
+                  </article>
+                );
+              }
+            )}
+          </div>
+
+          {/* EMPTY */}
+
+          {filteredUsers.length ===
+            0 && (
+            <div
+              className="
+                px-5
+                py-14
+
+                text-center
+
+                sm:py-20
+              "
+            >
+              <div
+                className="
+                  mx-auto
+
+                  flex
+                  h-16
+                  w-16
+                  items-center
+                  justify-center
+
+                  rounded-[20px]
+
+                  border
+                  border-[#E2D9F4]
+
+                  bg-[#F5F1FF]
+
+                  text-[#6C5CE7]
+                "
+              >
+                <UsersIcon />
+              </div>
+
+              <p
+                className="
+                  mt-4
+
+                  text-[9px]
+                  font-black
+                  uppercase
+                  tracking-[0.18em]
+
+                  text-[#927CE4]
+                "
+              >
+                Velmora
+                Community
+              </p>
+
+              <h3
+                className="
+                  mt-2
+
+                  text-lg
+                  font-extrabold
+                  text-[#39333E]
+                "
+              >
+                No accounts
+                found.
+              </h3>
+
+              <p
+                className="
+                  mx-auto
+                  mt-2
+
+                  max-w-sm
+
+                  text-sm
+                  leading-6
+                  text-[#918996]
+                "
+              >
+                No Velmora
+                customer or
+                administrator
+                account matches
+                the selected
+                search and
+                filters.
+              </p>
+
+              {(search ||
+                roleFilter !==
+                  "all" ||
+                statusFilter !==
+                  "all") && (
+                <button
+                  type="button"
+                  onClick={
+                    clearFilters
+                  }
+                  className="
+                    mt-5
+
+                    min-h-[44px]
+
+                    rounded-xl
+
+                    bg-gradient-to-r
+                    from-[#6C5CE7]
+                    to-[#8F78EA]
+
+                    px-5
+
+                    text-sm
+                    font-bold
+                    text-white
+
+                    shadow-[0_9px_22px_rgba(108,92,231,0.20)]
+
+                    transition-all
+
+                    hover:-translate-y-0.5
+                    hover:shadow-[0_13px_28px_rgba(108,92,231,0.28)]
+
+                    active:scale-[0.98]
+                  "
+                >
+                  Clear Filters
+                </button>
+              )}
+            </div>
+          )}
+        </section>
+
+        {/* =================================================
+            ANIMATION
+        ================================================= */}
+
+        <style>{`
+          @keyframes velmoraUserPageEnter {
             from {
               opacity: 0;
               transform: translateY(10px);
@@ -1968,10 +3146,10 @@ export default function AdminUserPage() {
             }
           }
 
-          @keyframes modalEnter {
+          @keyframes velmoraUserModalEnter {
             from {
               opacity: 0;
-              transform: scale(0.96) translateY(10px);
+              transform: scale(0.97) translateY(10px);
             }
 
             to {
@@ -1979,75 +3157,147 @@ export default function AdminUserPage() {
               transform: scale(1) translateY(0);
             }
           }
-        `}
-      </style>
 
+          @media (prefers-reduced-motion: reduce) {
+            .animate-\\[velmoraUserPageEnter_0\\.4s_ease-out\\],
+            .animate-\\[velmoraUserModalEnter_0\\.25s_ease-out\\] {
+              animation: none !important;
+            }
+          }
+        `}</style>
+      </div>
     </div>
   );
 }
 
-// =========================================================
-// STAT CARD
-// =========================================================
+/* =========================================================
+   STAT CARD
+========================================================= */
 
-function StatCard({
+function UserStatCard({
   title,
   value,
+  type,
 }) {
+  const styles = {
+    total: {
+      card:
+        "border-[#E0D7F5] bg-[#F7F4FF]",
+
+      icon:
+        "bg-[#6C5CE7] text-white",
+    },
+
+    enabled: {
+      card:
+        "border-[#D7EADF] bg-[#F2F9F5]",
+
+      icon:
+        "bg-[#DCEFE5] text-[#478465]",
+    },
+
+    blocked: {
+      card:
+        "border-[#F0D6DB] bg-[#FFF4F5]",
+
+      icon:
+        "bg-[#F9DCE1] text-[#B45462]",
+    },
+
+    admin: {
+      card:
+        "border-[#EDDFC6] bg-[#FFF9EF]",
+
+      icon:
+        "bg-[#F4E6CC] text-[#A47837]",
+    },
+  };
+
+  const current =
+    styles[type] ||
+    styles.total;
+
   return (
     <div
-      className="
-        bg-white
+      className={`
+        rounded-[20px]
 
         border
-        border-gray-100
 
-        rounded-2xl
-
-        p-4
-        sm:p-5
-
-        shadow-sm
+        p-3.5
 
         transition-all
         duration-300
 
+        hover:-translate-y-0.5
         hover:shadow-md
-        hover:-translate-y-1
-      "
-    >
 
-      <p
+        sm:p-4
+
+        ${current.card}
+      `}
+    >
+      <div
         className="
-          text-xs
-          sm:text-sm
-          text-gray-400
+          flex
+          items-center
+          justify-between
+          gap-2
         "
       >
-        {title}
-      </p>
+        <p
+          className="
+            text-[9px]
+            font-semibold
+            leading-4
+            text-[#7D7581]
+
+            sm:text-xs
+          "
+        >
+          {title}
+        </p>
+
+        <div
+          className={`
+            flex
+            h-8
+            w-8
+            shrink-0
+            items-center
+            justify-center
+
+            rounded-xl
+
+            ${current.icon}
+          `}
+        >
+          <UsersIcon />
+        </div>
+      </div>
 
       <p
         className="
-          text-2xl
-          sm:text-3xl
+          mt-3
 
-          font-bold
-          text-[#393E46]
+          text-lg
+          font-extrabold
+          tracking-[-0.025em]
 
-          mt-1
+          text-[#39333E]
+
+          sm:text-xl
         "
       >
         {value}
       </p>
-
     </div>
   );
 }
 
-// =========================================================
-// DETAIL CARD
-// =========================================================
+/* =========================================================
+   DETAIL CARD
+========================================================= */
 
 function DetailCard({
   title,
@@ -2058,23 +3308,32 @@ function DetailCard({
   return (
     <div
       className="
-        p-4
+        min-w-0
 
-        rounded-xl
-
-        bg-gray-50
+        rounded-2xl
 
         border
-        border-gray-100
+        border-[#EAE4EF]
+
+        bg-[#FCFAFD]
+
+        p-4
+
+        transition-all
+
+        hover:border-[#DED4EF]
+        hover:bg-white
+        hover:shadow-sm
       "
     >
-
       <p
         className="
-          text-xs
-          text-gray-400
+          text-[9px]
+          font-black
+          uppercase
+          tracking-[0.12em]
 
-          mb-1
+          text-[#9A929E]
         "
       >
         {title}
@@ -2082,21 +3341,25 @@ function DetailCard({
 
       <div
         className="
-          flex
-          items-center
-          justify-between
+          mt-2
 
+          flex
+          items-start
+          justify-between
           gap-3
         "
       >
-
         <p
           className="
-            text-sm
-            font-semibold
-            text-[#393E46]
+            min-w-0
 
             break-all
+
+            text-sm
+            font-semibold
+            leading-6
+
+            text-[#514A56]
           "
         >
           {value}
@@ -2110,32 +3373,39 @@ function DetailCard({
                 onButtonClick
               }
               className="
+                flex
+                min-h-[34px]
                 shrink-0
-
-                px-2.5
-                py-1
+                items-center
+                justify-center
+                gap-1.5
 
                 rounded-lg
 
-                bg-purple-50
-                text-purple-600
+                border
+                border-[#DFD6F3]
 
-                text-xs
-                font-semibold
+                bg-[#F4F0FF]
 
-                hover:bg-purple-100
+                px-2.5
 
-                active:scale-95
+                text-[10px]
+                font-bold
+                text-[#6C5CE7]
 
                 transition-all
+
+                hover:bg-[#EDE6FF]
+
+                active:scale-95
               "
             >
+              <CopyIcon />
+
               {buttonText}
             </button>
           )}
-
       </div>
-
     </div>
   );
 }

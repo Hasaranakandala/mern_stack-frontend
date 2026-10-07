@@ -1,65 +1,413 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import toast from "react-hot-toast";
+
 import {
   Link,
   useLocation,
   useNavigate,
 } from "react-router-dom";
+
 import MediaUpload from "../../utils/mediaUpload";
 
+/*
+=========================================================
+VELMORA — EDIT PRODUCT
+=========================================================
+
+Primary Violet   #6C5CE7
+Soft Lavender    #B8A1FF
+Soft Rose        #F2B8C6
+Champagne        #EADBC8
+Warm Ivory       #FAF9F7
+Surface          #FFFFFF
+Charcoal         #2F3136
+Muted Text       #6B7280
+
+Success          #4F9D7A
+Warning          #D99A3E
+Error            #D95C5C
+
+Direction:
+Quiet Luxury
+Premium Beauty
+Professional Administration
+Responsive
+=========================================================
+*/
+
+/* =========================================================
+   ICONS
+========================================================= */
+
+function BackIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path d="M19 12H5" />
+      <path d="m11 18-6-6 6-6" />
+    </svg>
+  );
+}
+
+function EditIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <path d="M12 20H5a1 1 0 0 1-1-1v-7" />
+      <path d="m14.5 5.5 4 4" />
+      <path d="m6 18 2.2-5.2L17 4a1.4 1.4 0 0 1 2 0l1 1a1.4 1.4 0 0 1 0 2l-8.8 8.8L6 18Z" />
+    </svg>
+  );
+}
+
+function ImageIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <rect
+        x="3"
+        y="4"
+        width="18"
+        height="16"
+        rx="3"
+      />
+
+      <circle
+        cx="9"
+        cy="10"
+        r="2"
+      />
+
+      <path d="m5 18 5-5 3 3 2-2 4 4" />
+    </svg>
+  );
+}
+
+function PriceIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <path d="M12 2v20" />
+      <path d="M17 6.5H9.5a3 3 0 0 0 0 6H14a3 3 0 0 1 0 6H6.5" />
+    </svg>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <rect
+        x="5"
+        y="10"
+        width="14"
+        height="10"
+        rx="2"
+      />
+
+      <path d="M8 10V7a4 4 0 1 1 8 0v3" />
+    </svg>
+  );
+}
+
+function UploadIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-6 w-6"
+      aria-hidden="true"
+    >
+      <path d="M12 16V4" />
+      <path d="m8 8 4-4 4 4" />
+      <path d="M5 20h14" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path d="M6 6l12 12" />
+      <path d="M18 6 6 18" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path d="m5 12 4 4L19 6" />
+    </svg>
+  );
+}
+
+/* =========================================================
+   SECTION TITLE
+========================================================= */
+
+function SectionTitle({
+  eyebrow,
+  title,
+  description,
+  icon,
+}) {
+  return (
+    <div
+      className="
+        flex
+        items-start
+        gap-3
+
+        border-b
+        border-[#EEE9F2]
+
+        pb-5
+
+        sm:gap-4
+        sm:pb-6
+      "
+    >
+      <div
+        className="
+          flex
+          h-11
+          w-11
+          shrink-0
+          items-center
+          justify-center
+
+          rounded-2xl
+
+          border
+          border-[#E0D7F5]
+
+          bg-[#F3EEFF]
+
+          text-[#6C5CE7]
+
+          sm:h-12
+          sm:w-12
+        "
+      >
+        {icon}
+      </div>
+
+      <div>
+        <p
+          className="
+            text-[9px]
+            font-black
+            uppercase
+            tracking-[0.18em]
+
+            text-[#927CE4]
+
+            sm:text-[10px]
+          "
+        >
+          {eyebrow}
+        </p>
+
+        <h2
+          className="
+            mt-1
+
+            text-lg
+            font-extrabold
+            tracking-[-0.02em]
+
+            text-[#2F3136]
+
+            sm:text-xl
+          "
+        >
+          {title}
+        </h2>
+
+        {description && (
+          <p
+            className="
+              mt-1
+
+              max-w-2xl
+
+              text-xs
+              leading-5
+
+              text-[#817A85]
+
+              sm:text-sm
+              sm:leading-6
+            "
+          >
+            {description}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================
+   PAGE
+========================================================= */
+
 export default function EditProductPage() {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate =
+    useNavigate();
 
-  // Product sent from AdminProductPage
-  const product = location.state;
+  const location =
+    useLocation();
 
-  // =====================================================
-  // STATES
-  // =====================================================
+  /*
+    Product is passed from
+    AdminProductPage.
+  */
 
-  const [productId] = useState(
-    product?.productId || ""
+  const product =
+    location.state;
+
+  /* =====================================================
+     STATES
+  ===================================================== */
+
+  const [
+    productId,
+  ] = useState(
+    product?.productId ||
+      ""
   );
 
-  const [name, setName] = useState(
-    product?.productName || ""
+  const [
+    name,
+    setName,
+  ] = useState(
+    product?.productName ||
+      ""
   );
 
-  const [altNames, setAltNames] = useState(
-    product?.alternativeName?.join(", ") || ""
+  const [
+    altNames,
+    setAltNames,
+  ] = useState(
+    Array.isArray(
+      product?.alternativeName
+    )
+      ? product.alternativeName.join(
+          ", "
+        )
+      : product?.alternativeName ||
+        ""
   );
 
-  const [description, setDescription] = useState(
-    product?.description || ""
+  const [
+    description,
+    setDescription,
+  ] = useState(
+    product?.description ||
+      ""
   );
 
-  // New files selected by admin
-  const [images, setImages] = useState([]);
+  /*
+    New files selected by admin.
+    New images replace current images
+    after a successful update.
+  */
 
-  // New image local previews
-  const [newImagePreviews, setNewImagePreviews] =
-    useState([]);
+  const [
+    images,
+    setImages,
+  ] = useState([]);
 
-  const [labelPrice, setLabelPrice] = useState(
-    product?.labelPrice ?? 0
+  const [
+    newImagePreviews,
+    setNewImagePreviews,
+  ] = useState([]);
+
+  const [
+    labelPrice,
+    setLabelPrice,
+  ] = useState(
+    product?.labelPrice ??
+      0
   );
 
-  const [price, setPrice] = useState(
+  const [
+    price,
+    setPrice,
+  ] = useState(
     product?.price ?? 0
   );
 
-  const [stock, setStock] = useState(
+  const [
+    stock,
+    setStock,
+  ] = useState(
     product?.stock ?? 0
   );
 
-  const [isUpdating, setIsUpdating] =
-    useState(false);
+  const [
+    isUpdating,
+    setIsUpdating,
+  ] = useState(false);
 
-  // =====================================================
-  // HANDLE MISSING PRODUCT STATE
-  // =====================================================
+  /* =====================================================
+     HANDLE MISSING PRODUCT
+  ===================================================== */
 
   useEffect(() => {
     if (!product) {
@@ -67,221 +415,307 @@ export default function EditProductPage() {
         "Product information not found. Please select a product again."
       );
 
-      navigate("/admin/products", {
-        replace: true,
-      });
+      navigate(
+        "/admin/products",
+        {
+          replace: true,
+        }
+      );
     }
-  }, [product, navigate]);
+  }, [
+    product,
+    navigate,
+  ]);
 
-  // =====================================================
-  // CREATE PREVIEWS FOR NEW IMAGES
-  // =====================================================
+  /* =====================================================
+     LOCAL PREVIEWS
+  ===================================================== */
 
   useEffect(() => {
-    if (images.length === 0) {
-      setNewImagePreviews([]);
+    if (
+      images.length ===
+      0
+    ) {
+      setNewImagePreviews(
+        []
+      );
+
       return;
     }
 
-    const previews = images.map((image) =>
-      URL.createObjectURL(image)
+    const previews =
+      images.map(
+        (image) =>
+          URL.createObjectURL(
+            image
+          )
+      );
+
+    setNewImagePreviews(
+      previews
     );
 
-    setNewImagePreviews(previews);
-
     return () => {
-      previews.forEach((preview) =>
-        URL.revokeObjectURL(preview)
+      previews.forEach(
+        (preview) =>
+          URL.revokeObjectURL(
+            preview
+          )
       );
     };
   }, [images]);
 
-  // =====================================================
-  // HANDLE IMAGE SELECTION
-  // =====================================================
+  /* =====================================================
+     IMAGE SELECTION
+  ===================================================== */
 
-  function handleImageChange(e) {
-    const selectedFiles = Array.from(
-      e.target.files
-    );
-
-    if (selectedFiles.length === 0) {
-      return;
-    }
-
-    // Maximum 6 images
-    if (selectedFiles.length > 6) {
-      toast.error(
-        "You can select a maximum of 6 images"
+  function handleImageChange(
+    event
+  ) {
+    const selectedFiles =
+      Array.from(
+        event.target.files
       );
+
+    if (
+      selectedFiles.length ===
+      0
+    ) {
       return;
     }
 
-    // Validate type
-    const invalidImage = selectedFiles.find(
-      (file) =>
-        !file.type.startsWith("image/")
-    );
-
-    if (invalidImage) {
+    if (
+      selectedFiles.length >
+      6
+    ) {
       toast.error(
-        "Please select image files only"
+        "You can select a maximum of 6 images."
       );
+
       return;
     }
 
-    // Maximum 5 MB each
-    const oversizedImage = selectedFiles.find(
-      (file) =>
-        file.size >
-        5 * 1024 * 1024
-    );
+    const invalidImage =
+      selectedFiles.find(
+        (file) =>
+          !file.type.startsWith(
+            "image/"
+          )
+      );
 
-    if (oversizedImage) {
+    if (
+      invalidImage
+    ) {
       toast.error(
-        "Each image must be smaller than 5MB"
+        "Please select image files only."
       );
+
       return;
     }
 
-    setImages(selectedFiles);
+    const oversizedImage =
+      selectedFiles.find(
+        (file) =>
+          file.size >
+          5 *
+            1024 *
+            1024
+      );
+
+    if (
+      oversizedImage
+    ) {
+      toast.error(
+        "Each image must be smaller than 5MB."
+      );
+
+      return;
+    }
+
+    setImages(
+      selectedFiles
+    );
   }
 
-  // =====================================================
-  // REMOVE NEW SELECTED IMAGE
-  // =====================================================
+  /* =====================================================
+     REMOVE NEW IMAGE
+  ===================================================== */
 
-  function removeNewImage(index) {
-    setImages((previousImages) =>
-      previousImages.filter(
-        (_, currentIndex) =>
-          currentIndex !== index
-      )
+  function removeNewImage(
+    index
+  ) {
+    setImages(
+      (
+        previousImages
+      ) =>
+        previousImages.filter(
+          (
+            _,
+            currentIndex
+          ) =>
+            currentIndex !==
+            index
+        )
     );
   }
 
-  // =====================================================
-  // EDIT PRODUCT
-  // =====================================================
+  /* =====================================================
+     CLEAR REPLACEMENT IMAGES
+  ===================================================== */
 
-  async function editProduct(e) {
-    e.preventDefault();
+  function clearReplacementImages() {
+    setImages([]);
+  }
+
+  /* =====================================================
+     UPDATE PRODUCT
+  ===================================================== */
+
+  async function editProduct(
+    event
+  ) {
+    event.preventDefault();
 
     if (isUpdating) {
       return;
     }
 
     const token =
-      localStorage.getItem("token");
-
-    // ===============================================
-    // TOKEN VALIDATION
-    // ===============================================
+      localStorage.getItem(
+        "token"
+      );
 
     if (!token) {
-      toast.error("Please login first");
+      toast.error(
+        "Please sign in first."
+      );
+
       return;
     }
 
-    // ===============================================
-    // FORM VALIDATION
-    // ===============================================
+    if (
+      !productId.trim()
+    ) {
+      toast.error(
+        "Product ID is missing."
+      );
 
-    if (!productId.trim()) {
-      toast.error("Product ID is missing");
       return;
     }
 
     if (!name.trim()) {
       toast.error(
-        "Please enter the product name"
+        "Please enter the product name."
       );
+
       return;
     }
 
-    if (!description.trim()) {
+    if (
+      !description.trim()
+    ) {
       toast.error(
-        "Please enter a product description"
+        "Please enter a product description."
       );
+
       return;
     }
 
-    if (Number(labelPrice) < 0) {
+    if (
+      Number(
+        labelPrice
+      ) < 0
+    ) {
       toast.error(
-        "Label price cannot be negative"
+        "Label price cannot be negative."
       );
+
       return;
     }
 
-    if (Number(price) < 0) {
+    if (
+      Number(price) <
+      0
+    ) {
       toast.error(
-        "Selling price cannot be negative"
+        "Selling price cannot be negative."
       );
+
       return;
     }
 
-    if (Number(stock) < 0) {
+    if (
+      Number(stock) <
+      0
+    ) {
       toast.error(
-        "Stock cannot be negative"
+        "Stock cannot be negative."
       );
+
       return;
     }
 
     setIsUpdating(true);
 
-    const loadingToast = toast.loading(
-      images.length > 0
-        ? "Uploading images and updating product..."
-        : "Updating product..."
-    );
+    const loadingToast =
+      toast.loading(
+        images.length >
+          0
+          ? "Uploading new Velmora imagery..."
+          : "Updating Velmora product..."
+      );
 
     try {
-      // ===============================================
-      // KEEP EXISTING IMAGES BY DEFAULT
-      // ===============================================
+      /*
+        Keep existing images if
+        no replacement images
+        were selected.
+      */
 
-      let imageUrls = product?.images || [];
+      let imageUrls =
+        product?.images ||
+        [];
 
-      // ===============================================
-      // IF NEW IMAGES SELECTED, UPLOAD AND REPLACE
-      // ===============================================
+      /*
+        New selection replaces
+        current image collection.
+      */
 
-      if (images.length > 0) {
-        const uploadPromises = images.map(
-          (image) =>
-            MediaUpload(image)
-        );
+      if (
+        images.length >
+        0
+      ) {
+        const uploadPromises =
+          images.map(
+            (image) =>
+              MediaUpload(
+                image
+              )
+          );
 
         imageUrls =
           await Promise.all(
             uploadPromises
           );
-
-        console.log(
-          "New uploaded images:",
-          imageUrls
-        );
       }
 
-      // ===============================================
-      // CLEAN ALTERNATIVE NAMES
-      // ===============================================
-
-      const alternativeNames = altNames
-        .split(",")
-        .map((item) => item.trim())
-        .filter(
-          (item) => item !== ""
-        );
-
-      // ===============================================
-      // UPDATED PRODUCT OBJECT
-      // ===============================================
+      const alternativeNames =
+        altNames
+          .split(",")
+          .map((item) =>
+            item.trim()
+          )
+          .filter(
+            (item) =>
+              item !== ""
+          );
 
       const updatedProduct = {
-        productId: productId.trim(),
+        productId:
+          productId.trim(),
 
-        productName: name.trim(),
+        productName:
+          name.trim(),
 
         alternativeName:
           alternativeNames,
@@ -289,10 +723,13 @@ export default function EditProductPage() {
         description:
           description.trim(),
 
-        images: imageUrls,
+        images:
+          imageUrls,
 
         labelPrice:
-          Number(labelPrice),
+          Number(
+            labelPrice
+          ),
 
         price:
           Number(price),
@@ -301,36 +738,27 @@ export default function EditProductPage() {
           Number(stock),
       };
 
-      console.log(
-        "Updating product:",
-        updatedProduct
-      );
+      const response =
+        await axios.put(
+          import.meta.env
+            .VITE_BACKEND_URL +
+            "/api/product/" +
+            productId,
 
-      // ===============================================
-      // UPDATE PRODUCT
-      // IMPORTANT: / BEFORE productId
-      // ===============================================
+          updatedProduct,
 
-      const res = await axios.put(
-        import.meta.env
-          .VITE_BACKEND_URL +
-          "/api/product/" +
-          productId,
-
-        updatedProduct,
-
-        {
-          headers: {
-            Authorization:
-              "Bearer " +
-              token,
-          },
-        }
-      );
+          {
+            headers: {
+              Authorization:
+                "Bearer " +
+                token,
+            },
+          }
+        );
 
       console.log(
         "Product updated:",
-        res.data
+        response.data
       );
 
       toast.dismiss(
@@ -338,7 +766,7 @@ export default function EditProductPage() {
       );
 
       toast.success(
-        "Product updated successfully!"
+        "Velmora product updated successfully."
       );
 
       navigate(
@@ -364,1638 +792,2665 @@ export default function EditProductPage() {
           ?.message ||
           error.response?.data
             ?.errorMessage ||
-          "Failed to update product"
+          "Failed to update the product."
       );
     } finally {
-      setIsUpdating(false);
+      setIsUpdating(
+        false
+      );
     }
   }
 
-  // =====================================================
-  // PRODUCT NOT FOUND
-  // =====================================================
+  /* =====================================================
+     DERIVED UI VALUES
+  ===================================================== */
+
+  const discountPercentage =
+    useMemo(() => {
+      const original =
+        Number(
+          labelPrice
+        );
+
+      const selling =
+        Number(price);
+
+      if (
+        original <= 0 ||
+        selling <= 0 ||
+        original <= selling
+      ) {
+        return 0;
+      }
+
+      return Math.round(
+        ((original -
+          selling) /
+          original) *
+          100
+      );
+    }, [
+      labelPrice,
+      price,
+    ]);
+
+  const previewImages =
+    newImagePreviews
+      .length > 0
+      ? newImagePreviews
+      : product?.images ||
+        [];
+
+  const mainPreviewImage =
+    previewImages?.[0];
+
+  const stockNumber =
+    Number(stock);
+
+  const currentImages =
+    product?.images ||
+    [];
+
+  /* =====================================================
+     COMMON CLASSES
+  ===================================================== */
+
+  const labelClass = `
+    mb-2
+    block
+
+    text-sm
+    font-bold
+
+    text-[#4B4550]
+  `;
+
+  const inputClass = `
+    min-h-[52px]
+    w-full
+
+    rounded-2xl
+
+    border
+    border-[#DED8E4]
+
+    bg-white
+
+    px-4
+
+    text-sm
+    text-[#2F3136]
+
+    outline-none
+
+    transition-all
+    duration-300
+
+    placeholder:text-[#AAA3AF]
+
+    hover:border-[#CFC5D8]
+
+    focus:border-[#B8A1FF]
+    focus:ring-4
+    focus:ring-[#B8A1FF]/15
+
+    disabled:cursor-not-allowed
+    disabled:bg-[#F4F2F5]
+    disabled:text-[#98909D]
+
+    sm:text-base
+  `;
+
+  /* =====================================================
+     MISSING PRODUCT FALLBACK
+  ===================================================== */
 
   if (!product) {
     return (
       <div
         className="
-          w-full
-          min-h-[60vh]
-
           flex
+          min-h-[60vh]
+          w-full
           items-center
           justify-center
+
+          bg-[#FAF9F7]
+
+          px-4
         "
       >
         <div className="text-center">
           <div
             className="
-              w-14
-              h-14
-
               mx-auto
 
-              rounded-full
-
-              bg-gray-100
-
               flex
+              h-16
+              w-16
               items-center
               justify-center
 
-              mb-3
+              rounded-[20px]
+
+              border
+              border-[#E1D8F4]
+
+              bg-[#F4F0FF]
+
+              text-[#6C5CE7]
             "
           >
-            <svg
-              className="
-                w-7
-                h-7
-                text-gray-400
-              "
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 9v2m0 4h.01"
-              />
-            </svg>
+            <EditIcon />
           </div>
 
           <p
             className="
-              font-semibold
-              text-gray-600
+              mt-4
+
+              text-[9px]
+              font-black
+              uppercase
+              tracking-[0.17em]
+
+              text-[#927CE4]
             "
           >
-            Loading product...
+            Velmora
+          </p>
+
+          <h2
+            className="
+              mt-2
+
+              text-lg
+              font-extrabold
+              text-[#39333E]
+            "
+          >
+            Product not
+            available.
+          </h2>
+
+          <p
+            className="
+              mt-2
+              text-sm
+              text-[#8D8591]
+            "
+          >
+            Returning to the
+            Velmora product
+            collection.
           </p>
         </div>
       </div>
     );
   }
 
-  // =====================================================
-  // PAGE
-  // =====================================================
+  /* =====================================================
+     PAGE
+  ===================================================== */
 
   return (
     <div
       className="
-        w-full
+        relative
+
         min-h-screen
-
-        bg-[#F8F9FA]
-
-        px-3
-        sm:px-5
-        md:px-8
-
-        py-5
-        sm:py-7
-        md:py-10
+        w-full
 
         overflow-x-hidden
+
+        bg-[#FAF9F7]
+
+        px-3
+        py-5
+
+        sm:px-5
+        sm:py-7
+
+        lg:px-7
+        lg:py-8
+
+        xl:px-8
       "
     >
+      {/* =================================================
+          AMBIENCE
+      ================================================= */}
+
       <div
         className="
-          w-full
-          max-w-4xl
+          pointer-events-none
+
+          absolute
+          -left-36
+          -top-28
+
+          h-[380px]
+          w-[380px]
+
+          rounded-full
+
+          bg-[#B8A1FF]/8
+
+          blur-[120px]
+        "
+      />
+
+      <div
+        className="
+          pointer-events-none
+
+          absolute
+          -right-36
+          top-[600px]
+
+          h-[420px]
+          w-[420px]
+
+          rounded-full
+
+          bg-[#F2B8C6]/7
+
+          blur-[130px]
+        "
+      />
+
+      <div
+        className="
+          relative
+          z-10
 
           mx-auto
+          w-full
+          max-w-[1380px]
 
-          animate-[editProductEnter_0.4s_ease-out]
+          animate-[velmoraEditEnter_0.4s_ease-out]
         "
       >
         {/* =================================================
-            TOP HEADER
+            HERO / PAGE HEADER
         ================================================= */}
 
-        <div
+        <section
           className="
-            flex
-            flex-col
-            sm:flex-row
+            relative
 
-            sm:items-center
-            sm:justify-between
+            mb-6
 
-            gap-4
+            overflow-hidden
 
-            mb-5
-            sm:mb-6
-          "
-        >
-          <div>
-            <p
-              className="
-                text-xs
-
-                uppercase
-                tracking-[0.15em]
-
-                font-semibold
-                text-gray-400
-
-                mb-1
-              "
-            >
-              Product Management
-            </p>
-
-            <h1
-              className="
-                text-2xl
-                sm:text-3xl
-
-                font-bold
-                text-[#393E46]
-              "
-            >
-              Edit Product
-            </h1>
-
-            <p
-              className="
-                text-sm
-                text-gray-500
-
-                mt-1
-              "
-            >
-              Update product information,
-              pricing, stock and images.
-            </p>
-          </div>
-
-          {/* Back */}
-
-          <Link
-            to="/admin/products"
-            className="
-              group
-
-              w-full
-              sm:w-auto
-
-              inline-flex
-              items-center
-              justify-center
-
-              gap-2
-
-              px-4
-              py-2.5
-
-              rounded-xl
-
-              bg-white
-
-              border
-              border-gray-200
-
-              text-sm
-              font-semibold
-              text-gray-600
-
-              shadow-sm
-
-              hover:border-green-500
-              hover:text-green-600
-              hover:shadow-md
-
-              active:scale-[0.97]
-
-              transition-all
-              duration-300
-            "
-          >
-            <svg
-              className="
-                w-4
-                h-4
-
-                transition-transform
-                duration-300
-
-                group-hover:-translate-x-1
-              "
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-
-            Back to Products
-          </Link>
-        </div>
-
-        {/* =================================================
-            FORM
-        ================================================= */}
-
-        <form
-          onSubmit={editProduct}
-          className="
-            w-full
-
-            bg-white
-
-            rounded-2xl
-            sm:rounded-3xl
+            rounded-[26px]
 
             border
-            border-gray-200
+            border-[#E9E2F0]
 
-            shadow-sm
+            bg-gradient-to-r
+            from-[#F5F1FF]
+            via-white
+            to-[#FFF3F7]
 
-            p-4
+            p-5
+
+            shadow-[0_16px_50px_rgba(63,48,84,0.05)]
+
+            sm:rounded-[30px]
             sm:p-6
-            md:p-8
-
-            transition-shadow
-            duration-300
-
-            hover:shadow-md
           "
         >
-          {/* =================================================
-              FORM HEADER
-          ================================================= */}
+          <div
+            className="
+              pointer-events-none
+
+              absolute
+              -right-20
+              -top-20
+
+              h-52
+              w-52
+
+              rounded-full
+
+              bg-[#B8A1FF]/14
+
+              blur-3xl
+            "
+          />
 
           <div
             className="
+              relative
+
               flex
-              items-start
-
-              gap-3
-
-              pb-5
-              sm:pb-6
-
-              mb-6
-
-              border-b
-              border-gray-100
-            "
-          >
-            <div
-              className="
-                w-11
-                h-11
-                sm:w-12
-                sm:h-12
-
-                shrink-0
-
-                rounded-xl
-
-                bg-blue-50
-                text-blue-600
-
-                flex
-                items-center
-                justify-center
-              "
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
-              </svg>
-            </div>
-
-            <div>
-              <h2
-                className="
-                  text-lg
-                  sm:text-xl
-
-                  font-bold
-                  text-[#393E46]
-                "
-              >
-                Product Information
-              </h2>
-
-              <p
-                className="
-                  text-xs
-                  sm:text-sm
-
-                  text-gray-500
-
-                  mt-1
-                "
-              >
-                Editing product{" "}
-                <span
-                  className="
-                    font-semibold
-                    text-gray-700
-                  "
-                >
-                  {productId}
-                </span>
-              </p>
-            </div>
-          </div>
-
-          {/* =================================================
-              PRODUCT ID + PRODUCT NAME
-          ================================================= */}
-
-          <div
-            className="
-              grid
-              grid-cols-1
-              md:grid-cols-2
-
+              flex-col
               gap-5
+
+              sm:flex-row
+              sm:items-center
+              sm:justify-between
             "
           >
-            {/* Product ID */}
-
             <div>
-              <label
-                className="
-                  block
-
-                  text-sm
-                  font-semibold
-                  text-gray-700
-
-                  mb-2
-                "
-              >
-                Product ID
-              </label>
-
-              <div className="relative">
-                <input
-                  type="text"
-                  value={
-                    productId
-                  }
-                  disabled
-                  className="
-                    w-full
-
-                    px-4
-                    py-3
-
-                    pr-10
-
-                    rounded-xl
-
-                    border
-                    border-gray-200
-
-                    bg-gray-100
-
-                    text-gray-500
-
-                    cursor-not-allowed
-
-                    outline-none
-                  "
-                />
-
-                <svg
-                  className="
-                    absolute
-                    right-4
-                    top-1/2
-                    -translate-y-1/2
-
-                    w-4
-                    h-4
-
-                    text-gray-400
-                  "
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4"
-                  />
-                </svg>
-              </div>
-
-              <p
-                className="
-                  text-xs
-                  text-gray-400
-
-                  mt-1.5
-                "
-              >
-                Product ID cannot be changed.
-              </p>
-            </div>
-
-            {/* Product Name */}
-
-            <div>
-              <label
-                className="
-                  block
-
-                  text-sm
-                  font-semibold
-                  text-gray-700
-
-                  mb-2
-                "
-              >
-                Product Name
-                <span className="text-red-500 ml-1">
-                  *
-                </span>
-              </label>
-
-              <input
-                type="text"
-                placeholder="Enter product name"
-                value={name}
-                disabled={
-                  isUpdating
-                }
-                onChange={(e) =>
-                  setName(
-                    e.target.value
-                  )
-                }
-                className="
-                  w-full
-
-                  px-4
-                  py-3
-
-                  rounded-xl
-
-                  border
-                  border-gray-300
-
-                  outline-none
-
-                  placeholder:text-gray-400
-
-                  focus:ring-2
-                  focus:ring-green-500/20
-                  focus:border-green-500
-
-                  hover:border-gray-400
-
-                  disabled:bg-gray-100
-
-                  transition-all
-                  duration-200
-                "
-              />
-            </div>
-          </div>
-
-          {/* =================================================
-              ALTERNATIVE NAMES
-          ================================================= */}
-
-          <div className="mt-5">
-            <label
-              className="
-                block
-
-                text-sm
-                font-semibold
-                text-gray-700
-
-                mb-2
-              "
-            >
-              Alternative Names
-            </label>
-
-            <input
-              type="text"
-              placeholder="e.g. Lipstick, Lip Color"
-              value={altNames}
-              disabled={
-                isUpdating
-              }
-              onChange={(e) =>
-                setAltNames(
-                  e.target.value
-                )
-              }
-              className="
-                w-full
-
-                px-4
-                py-3
-
-                rounded-xl
-
-                border
-                border-gray-300
-
-                outline-none
-
-                focus:ring-2
-                focus:ring-green-500/20
-                focus:border-green-500
-
-                hover:border-gray-400
-
-                disabled:bg-gray-100
-
-                transition-all
-              "
-            />
-
-            <p
-              className="
-                text-xs
-                text-gray-400
-
-                mt-2
-              "
-            >
-              Separate alternative names
-              using commas.
-            </p>
-          </div>
-
-          {/* =================================================
-              DESCRIPTION
-          ================================================= */}
-
-          <div className="mt-5">
-            <div
-              className="
-                flex
-                items-center
-                justify-between
-
-                gap-3
-
-                mb-2
-              "
-            >
-              <label
-                className="
-                  text-sm
-                  font-semibold
-                  text-gray-700
-                "
-              >
-                Description
-                <span className="text-red-500 ml-1">
-                  *
-                </span>
-              </label>
-
-              <span
-                className="
-                  text-xs
-                  text-gray-400
-                "
-              >
-                {description.length}/1000
-              </span>
-            </div>
-
-            <textarea
-              rows="5"
-              maxLength="1000"
-              placeholder="Enter product description..."
-              value={
-                description
-              }
-              disabled={
-                isUpdating
-              }
-              onChange={(e) =>
-                setDescription(
-                  e.target.value
-                )
-              }
-              className="
-                w-full
-
-                px-4
-                py-3
-
-                rounded-xl
-
-                border
-                border-gray-300
-
-                outline-none
-                resize-none
-
-                focus:ring-2
-                focus:ring-green-500/20
-                focus:border-green-500
-
-                hover:border-gray-400
-
-                disabled:bg-gray-100
-
-                transition-all
-              "
-            />
-          </div>
-
-          {/* =================================================
-              EXISTING IMAGES
-          ================================================= */}
-
-          {product.images?.length >
-            0 && (
-            <div className="mt-6">
-
               <div
                 className="
-                  flex
-                  flex-col
-                  sm:flex-row
-
-                  sm:items-center
-                  sm:justify-between
-
-                  gap-1
-
-                  mb-3
-                "
-              >
-                <label
-                  className="
-                    text-sm
-                    font-semibold
-                    text-gray-700
-                  "
-                >
-                  Current Product Images
-                </label>
-
-                <span
-                  className="
-                    text-xs
-                    text-gray-400
-                  "
-                >
-                  {product.images.length}{" "}
-                  current image
-                  {product.images.length >
-                  1
-                    ? "s"
-                    : ""}
-                </span>
-              </div>
-
-              <div
-                className="
-                  grid
-                  grid-cols-2
-                  sm:grid-cols-3
-                  md:grid-cols-4
-
-                  gap-3
-                "
-              >
-                {product.images.map(
-                  (
-                    image,
-                    index
-                  ) => (
-                    <div
-                      key={
-                        image +
-                        index
-                      }
-                      className="
-                        group
-
-                        relative
-
-                        aspect-square
-
-                        rounded-xl
-
-                        overflow-hidden
-
-                        bg-gray-100
-
-                        border
-                        border-gray-200
-
-                        shadow-sm
-                      "
-                    >
-                      <img
-                        src={image}
-                        alt={`Current product ${
-                          index +
-                          1
-                        }`}
-                        className="
-                          w-full
-                          h-full
-
-                          object-cover
-
-                          transition-transform
-                          duration-500
-
-                          group-hover:scale-105
-                        "
-                      />
-
-                      {index ===
-                        0 && (
-                        <span
-                          className="
-                            absolute
-                            bottom-2
-                            left-2
-
-                            px-2
-                            py-1
-
-                            rounded-md
-
-                            bg-black/60
-
-                            text-white
-
-                            text-[10px]
-                            font-semibold
-                          "
-                        >
-                          Main
-                        </span>
-                      )}
-                    </div>
-                  )
-                )}
-              </div>
-
-            </div>
-          )}
-
-          {/* =================================================
-              NEW IMAGES
-          ================================================= */}
-
-          <div
-            className="
-              mt-7
-              pt-6
-
-              border-t
-              border-gray-100
-            "
-          >
-            <div
-              className="
-                flex
-                flex-col
-                sm:flex-row
-
-                sm:items-center
-                sm:justify-between
-
-                gap-1
-
-                mb-2
-              "
-            >
-              <label
-                className="
-                  text-sm
-                  font-semibold
-                  text-gray-700
-                "
-              >
-                Replace Product Images
-              </label>
-
-              <span
-                className="
-                  text-xs
-                  text-gray-400
-                "
-              >
-                {images.length}/6 new images
-              </span>
-            </div>
-
-            <label
-              className={`
-                w-full
-
-                min-h-[140px]
-
-                border-2
-                border-dashed
-
-                rounded-2xl
-
-                px-5
-                py-6
-
-                flex
-                flex-col
-                items-center
-                justify-center
-
-                text-center
-
-                transition-all
-                duration-300
-
-                ${
-                  isUpdating
-                    ? "bg-gray-100 border-gray-200 cursor-not-allowed"
-                    : "bg-gray-50 border-gray-300 cursor-pointer hover:bg-green-50/30 hover:border-green-500"
-                }
-              `}
-            >
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                disabled={
-                  isUpdating
-                }
-                onChange={
-                  handleImageChange
-                }
-                className="hidden"
-              />
-
-              <div
-                className="
-                  w-12
-                  h-12
+                  inline-flex
+                  items-center
+                  gap-2
 
                   rounded-full
 
-                  bg-green-100
-                  text-green-600
-
-                  flex
-                  items-center
-                  justify-center
-
-                  mb-3
-                "
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 4v12m0-12l-4 4m4-4l4 4M5 20h14"
-                  />
-                </svg>
-              </div>
-
-              <p
-                className="
-                  text-sm
-                  sm:text-base
-
-                  font-semibold
-                  text-gray-700
-                "
-              >
-                Select new product images
-              </p>
-
-              <p
-                className="
-                  text-xs
-                  text-gray-400
-
-                  mt-1
-                "
-              >
-                Leave this empty to keep
-                the current images.
-              </p>
-
-              <p
-                className="
-                  text-xs
-                  text-gray-400
-
-                  mt-1
-                "
-              >
-                Maximum 6 images • 5MB each
-              </p>
-            </label>
-          </div>
-
-          {/* =================================================
-              NEW IMAGE PREVIEW
-          ================================================= */}
-
-          {newImagePreviews.length >
-            0 && (
-            <div className="mt-5">
-
-              <div
-                className="
-                  flex
-                  items-center
-                  justify-between
-
-                  mb-3
-                "
-              >
-                <p
-                  className="
-                    text-sm
-                    font-semibold
-                    text-gray-700
-                  "
-                >
-                  New Image Preview
-                </p>
-
-                <span
-                  className="
-                    text-xs
-                    font-semibold
-                    text-orange-500
-                  "
-                >
-                  These will replace current images
-                </span>
-              </div>
-
-              <div
-                className="
-                  grid
-                  grid-cols-2
-                  sm:grid-cols-3
-                  md:grid-cols-4
-
-                  gap-3
-                "
-              >
-                {newImagePreviews.map(
-                  (
-                    preview,
-                    index
-                  ) => (
-                    <div
-                      key={
-                        preview
-                      }
-                      className="
-                        group
-
-                        relative
-
-                        aspect-square
-
-                        overflow-hidden
-
-                        rounded-xl
-
-                        border
-                        border-green-200
-
-                        bg-gray-100
-
-                        shadow-sm
-
-                        transition-all
-
-                        hover:-translate-y-1
-                        hover:shadow-md
-                      "
-                    >
-                      <img
-                        src={
-                          preview
-                        }
-                        alt={`New preview ${
-                          index +
-                          1
-                        }`}
-                        className="
-                          w-full
-                          h-full
-
-                          object-cover
-
-                          transition-transform
-                          duration-500
-
-                          group-hover:scale-105
-                        "
-                      />
-
-                      {index ===
-                        0 && (
-                        <span
-                          className="
-                            absolute
-                            bottom-2
-                            left-2
-
-                            px-2
-                            py-1
-
-                            bg-green-600
-                            text-white
-
-                            rounded-md
-
-                            text-[10px]
-                            font-semibold
-                          "
-                        >
-                          New Main
-                        </span>
-                      )}
-
-                      {!isUpdating && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            removeNewImage(
-                              index
-                            )
-                          }
-                          className="
-                            absolute
-                            top-2
-                            right-2
-
-                            w-8
-                            h-8
-
-                            rounded-full
-
-                            bg-white/90
-                            text-red-500
-
-                            shadow-md
-
-                            flex
-                            items-center
-                            justify-center
-
-                            sm:opacity-0
-
-                            sm:group-hover:opacity-100
-
-                            hover:bg-red-500
-                            hover:text-white
-
-                            active:scale-90
-
-                            transition-all
-                          "
-                        >
-                          ✕
-                        </button>
-                      )}
-                    </div>
-                  )
-                )}
-              </div>
-
-            </div>
-          )}
-
-          {/* =================================================
-              PRICING AND STOCK
-          ================================================= */}
-
-          <div
-            className="
-              mt-7
-              pt-6
-
-              border-t
-              border-gray-100
-            "
-          >
-            <div className="mb-5">
-
-              <h3
-                className="
-                  text-base
-                  sm:text-lg
-
-                  font-bold
-                  text-[#393E46]
-                "
-              >
-                Pricing & Inventory
-              </h3>
-
-              <p
-                className="
-                  text-xs
-                  sm:text-sm
-
-                  text-gray-400
-
-                  mt-1
-                "
-              >
-                Update pricing and current
-                stock availability.
-              </p>
-
-            </div>
-
-            <div
-              className="
-                grid
-                grid-cols-1
-                sm:grid-cols-2
-
-                gap-5
-              "
-            >
-              {/* Label Price */}
-
-              <div>
-                <label
-                  className="
-                    block
-
-                    text-sm
-                    font-semibold
-                    text-gray-700
-
-                    mb-2
-                  "
-                >
-                  Label Price
-                </label>
-
-                <div className="relative">
-
-                  <span
-                    className="
-                      absolute
-                      left-4
-                      top-1/2
-                      -translate-y-1/2
-
-                      text-sm
-                      text-gray-400
-                    "
-                  >
-                    Rs.
-                  </span>
-
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={
-                      labelPrice
-                    }
-                    disabled={
-                      isUpdating
-                    }
-                    onChange={(e) =>
-                      setLabelPrice(
-                        e.target
-                          .value
-                      )
-                    }
-                    className="
-                      w-full
-
-                      pl-12
-                      pr-4
-                      py-3
-
-                      rounded-xl
-
-                      border
-                      border-gray-300
-
-                      outline-none
-
-                      focus:ring-2
-                      focus:ring-green-500/20
-                      focus:border-green-500
-
-                      disabled:bg-gray-100
-
-                      transition-all
-                    "
-                  />
-                </div>
-              </div>
-
-              {/* Selling Price */}
-
-              <div>
-                <label
-                  className="
-                    block
-
-                    text-sm
-                    font-semibold
-                    text-gray-700
-
-                    mb-2
-                  "
-                >
-                  Selling Price
-                </label>
-
-                <div className="relative">
-
-                  <span
-                    className="
-                      absolute
-                      left-4
-                      top-1/2
-                      -translate-y-1/2
-
-                      text-sm
-                      text-gray-400
-                    "
-                  >
-                    Rs.
-                  </span>
-
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={price}
-                    disabled={
-                      isUpdating
-                    }
-                    onChange={(e) =>
-                      setPrice(
-                        e.target
-                          .value
-                      )
-                    }
-                    className="
-                      w-full
-
-                      pl-12
-                      pr-4
-                      py-3
-
-                      rounded-xl
-
-                      border
-                      border-gray-300
-
-                      outline-none
-
-                      focus:ring-2
-                      focus:ring-green-500/20
-                      focus:border-green-500
-
-                      disabled:bg-gray-100
-
-                      transition-all
-                    "
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Stock */}
-
-            <div className="mt-5">
-
-              <label
-                className="
-                  block
-
-                  text-sm
-                  font-semibold
-                  text-gray-700
-
-                  mb-2
-                "
-              >
-                Stock Quantity
-              </label>
-
-              <input
-                type="number"
-                min="0"
-                value={stock}
-                disabled={
-                  isUpdating
-                }
-                onChange={(e) =>
-                  setStock(
-                    e.target.value
-                  )
-                }
-                className="
-                  w-full
-
-                  px-4
-                  py-3
-
-                  rounded-xl
-
                   border
-                  border-gray-300
+                  border-[#DED5F4]
 
-                  outline-none
+                  bg-white/75
 
-                  focus:ring-2
-                  focus:ring-green-500/20
-                  focus:border-green-500
+                  px-3
+                  py-1.5
 
-                  disabled:bg-gray-100
+                  text-[9px]
+                  font-black
+                  uppercase
+                  tracking-[0.18em]
 
-                  transition-all
+                  text-[#6C5CE7]
+
+                  sm:text-[10px]
                 "
-              />
+              >
+                <span className="text-[#B9955B]">
+                  ✦
+                </span>
 
-              {/* Stock status */}
-
-              <div className="mt-2">
-
-                {Number(stock) ===
-                0 ? (
-                  <span
-                    className="
-                      inline-flex
-
-                      px-2.5
-                      py-1
-
-                      rounded-full
-
-                      bg-red-100
-                      text-red-700
-
-                      text-xs
-                      font-semibold
-                    "
-                  >
-                    Out of Stock
-                  </span>
-                ) : Number(
-                    stock
-                  ) <= 5 ? (
-                  <span
-                    className="
-                      inline-flex
-
-                      px-2.5
-                      py-1
-
-                      rounded-full
-
-                      bg-yellow-100
-                      text-yellow-700
-
-                      text-xs
-                      font-semibold
-                    "
-                  >
-                    Low Stock
-                  </span>
-                ) : (
-                  <span
-                    className="
-                      inline-flex
-
-                      px-2.5
-                      py-1
-
-                      rounded-full
-
-                      bg-green-100
-                      text-green-700
-
-                      text-xs
-                      font-semibold
-                    "
-                  >
-                    {stock} Available
-                  </span>
-                )}
-
+                Velmora
+                Catalogue
+                Management
               </div>
+
+              <h1
+                className="
+                  mt-3
+
+                  text-2xl
+                  font-extrabold
+                  tracking-[-0.04em]
+
+                  text-[#2F3136]
+
+                  sm:text-3xl
+
+                  lg:text-[34px]
+                "
+              >
+                Refine a Beauty
+                Selection
+              </h1>
+
+              <p
+                className="
+                  mt-2
+
+                  max-w-2xl
+
+                  text-xs
+                  leading-6
+
+                  text-[#78717D]
+
+                  sm:text-sm
+                "
+              >
+                Update product
+                identity,
+                imagery,
+                pricing and
+                inventory while
+                keeping the
+                Velmora
+                collection
+                polished and
+                consistent.
+              </p>
             </div>
-          </div>
 
-          {/* =================================================
-              BUTTONS
-          ================================================= */}
-
-          <div
-            className="
-              flex
-              flex-col-reverse
-              sm:flex-row
-
-              sm:justify-end
-
-              gap-3
-
-              mt-8
-              pt-6
-
-              border-t
-              border-gray-100
-            "
-          >
             <Link
               to="/admin/products"
-              className={`
-                w-full
-                sm:w-auto
-
-                px-6
-                py-3
-
-                rounded-xl
-
-                border
-                border-gray-300
-
-                bg-white
-
-                text-center
-                text-gray-700
-
-                font-semibold
-
-                hover:bg-gray-100
-                hover:border-gray-400
-
-                active:scale-[0.98]
-
-                transition-all
-
-                ${
-                  isUpdating
-                    ? "pointer-events-none opacity-50"
-                    : ""
-                }
-              `}
-            >
-              Cancel
-            </Link>
-
-            <button
-              type="submit"
-              disabled={
-                isUpdating
-              }
               className="
                 group
 
+                inline-flex
+                min-h-[46px]
                 w-full
-                sm:w-auto
-
-                min-w-[180px]
-
-                px-7
-                py-3
-
-                rounded-xl
-
-                bg-green-600
-                text-white
-
-                font-semibold
-
-                shadow-md
-
-                flex
                 items-center
                 justify-center
                 gap-2
 
-                hover:bg-green-700
-                hover:shadow-lg
-                hover:-translate-y-0.5
+                rounded-xl
 
-                active:scale-[0.98]
+                border
+                border-[#DAD1EC]
 
-                disabled:bg-green-400
-                disabled:cursor-not-allowed
-                disabled:hover:translate-y-0
+                bg-white
+
+                px-4
+
+                text-sm
+                font-bold
+                text-[#625A68]
+
+                shadow-sm
 
                 transition-all
                 duration-300
+
+                hover:-translate-y-0.5
+                hover:border-[#C8B9F2]
+                hover:text-[#6C5CE7]
+                hover:shadow-md
+
+                active:scale-[0.98]
+
+                sm:w-auto
               "
             >
-              {isUpdating ? (
-                <>
-                  <svg
-                    className="
-                      w-5
-                      h-5
-                      animate-spin
-                    "
-                    fill="none"
-                    viewBox="0 0 24 24"
+              <span
+                className="
+                  transition-transform
+                  duration-300
+
+                  group-hover:-translate-x-1
+                "
+              >
+                <BackIcon />
+              </span>
+
+              Back to Products
+            </Link>
+          </div>
+        </section>
+
+        {/* =================================================
+            MAIN GRID
+        ================================================= */}
+
+        <div
+          className="
+            grid
+            grid-cols-1
+            gap-6
+
+            xl:grid-cols-[minmax(0,1fr)_350px]
+            xl:items-start
+            xl:gap-7
+          "
+        >
+          {/* =================================================
+              FORM
+          ================================================= */}
+
+          <form
+            onSubmit={
+              editProduct
+            }
+            className="
+              min-w-0
+
+              rounded-[26px]
+
+              border
+              border-[#E9E3EF]
+
+              bg-white
+
+              p-4
+
+              shadow-[0_18px_60px_rgba(64,48,86,0.055)]
+
+              sm:rounded-[32px]
+              sm:p-6
+
+              lg:p-8
+            "
+          >
+            {/* =============================================
+                PRODUCT IDENTITY
+            ============================================= */}
+
+            <section>
+              <SectionTitle
+                eyebrow="01 · Product Identity"
+                title="Product Information"
+                description="Refine the product name, alternative search terms and customer-facing description."
+                icon={
+                  <EditIcon />
+                }
+              />
+
+              <div
+                className="
+                  mt-6
+
+                  grid
+                  grid-cols-1
+                  gap-5
+
+                  md:grid-cols-2
+                "
+              >
+                {/* PRODUCT ID */}
+
+                <div>
+                  <label
+                    className={
+                      labelClass
+                    }
                   >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
+                    Product ID
+                  </label>
+
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={
+                        productId
+                      }
+                      disabled
+                      className="
+                        min-h-[52px]
+                        w-full
+
+                        rounded-2xl
+
+                        border
+                        border-[#E2DCE7]
+
+                        bg-[#F6F3F7]
+
+                        px-4
+                        pr-12
+
+                        text-sm
+                        font-semibold
+                        text-[#8A828E]
+
+                        outline-none
+
+                        cursor-not-allowed
+
+                        sm:text-base
+                      "
                     />
 
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                    />
-                  </svg>
+                    <div
+                      className="
+                        absolute
+                        right-4
+                        top-1/2
 
-                  Updating...
-                </>
-              ) : (
-                <>
-                  <svg
+                        -translate-y-1/2
+
+                        text-[#9E95A3]
+                      "
+                    >
+                      <LockIcon />
+                    </div>
+                  </div>
+
+                  <p
                     className="
-                      w-5
-                      h-5
+                      mt-2
+
+                      text-[10px]
+                      leading-5
+
+                      text-[#99919D]
+
+                      sm:text-xs
+                    "
+                  >
+                    This unique
+                    identifier is
+                    locked and
+                    cannot be
+                    changed.
+                  </p>
+                </div>
+
+                {/* PRODUCT NAME */}
+
+                <div>
+                  <label
+                    className={
+                      labelClass
+                    }
+                  >
+                    Product Name
+
+                    <span
+                      className="
+                        ml-1
+                        text-[#B46079]
+                      "
+                    >
+                      *
+                    </span>
+                  </label>
+
+                  <input
+                    type="text"
+                    value={name}
+                    disabled={
+                      isUpdating
+                    }
+                    placeholder="e.g. Velmora Radiance Serum"
+                    onChange={(
+                      event
+                    ) =>
+                      setName(
+                        event.target
+                          .value
+                      )
+                    }
+                    className={
+                      inputClass
+                    }
+                  />
+                </div>
+              </div>
+
+              {/* ALTERNATIVE NAMES */}
+
+              <div className="mt-5">
+                <label
+                  className={
+                    labelClass
+                  }
+                >
+                  Alternative
+                  Names
+                </label>
+
+                <input
+                  type="text"
+                  value={
+                    altNames
+                  }
+                  disabled={
+                    isUpdating
+                  }
+                  placeholder="e.g. Glow Serum, Vitamin C Serum"
+                  onChange={(
+                    event
+                  ) =>
+                    setAltNames(
+                      event.target
+                        .value
+                    )
+                  }
+                  className={
+                    inputClass
+                  }
+                />
+
+                <p
+                  className="
+                    mt-2
+
+                    text-[10px]
+                    leading-5
+
+                    text-[#99919D]
+
+                    sm:text-xs
+                  "
+                >
+                  Separate
+                  alternative
+                  search names
+                  using commas.
+                </p>
+              </div>
+
+              {/* DESCRIPTION */}
+
+              <div className="mt-5">
+                <div
+                  className="
+                    mb-2
+
+                    flex
+                    items-center
+                    justify-between
+                    gap-3
+                  "
+                >
+                  <label
+                    className="
+                      text-sm
+                      font-bold
+                      text-[#4B4550]
+                    "
+                  >
+                    Product
+                    Description
+
+                    <span
+                      className="
+                        ml-1
+                        text-[#B46079]
+                      "
+                    >
+                      *
+                    </span>
+                  </label>
+
+                  <span
+                    className="
+                      shrink-0
+
+                      text-[10px]
+                      font-medium
+
+                      text-[#A098A5]
+
+                      sm:text-xs
+                    "
+                  >
+                    {
+                      description.length
+                    }
+                    /1000
+                  </span>
+                </div>
+
+                <textarea
+                  rows="6"
+                  maxLength="1000"
+                  value={
+                    description
+                  }
+                  disabled={
+                    isUpdating
+                  }
+                  placeholder="Describe the product, key beauty benefits and recommended use..."
+                  onChange={(
+                    event
+                  ) =>
+                    setDescription(
+                      event.target
+                        .value
+                    )
+                  }
+                  className="
+                    w-full
+
+                    resize-none
+
+                    rounded-2xl
+
+                    border
+                    border-[#DED8E4]
+
+                    bg-white
+
+                    px-4
+                    py-3.5
+
+                    text-sm
+                    leading-7
+                    text-[#2F3136]
+
+                    outline-none
+
+                    transition-all
+                    duration-300
+
+                    placeholder:text-[#AAA3AF]
+
+                    hover:border-[#CFC5D8]
+
+                    focus:border-[#B8A1FF]
+                    focus:ring-4
+                    focus:ring-[#B8A1FF]/15
+
+                    disabled:cursor-not-allowed
+                    disabled:bg-[#F4F2F5]
+
+                    sm:text-base
+                  "
+                />
+              </div>
+            </section>
+
+            {/* =============================================
+                CURRENT IMAGES
+            ============================================= */}
+
+            <section
+              className="
+                mt-8
+
+                border-t
+                border-[#EEE9F2]
+
+                pt-7
+              "
+            >
+              <SectionTitle
+                eyebrow="02 · Current Imagery"
+                title="Existing Product Gallery"
+                description="Review the images currently representing this product in the Velmora collection."
+                icon={
+                  <ImageIcon />
+                }
+              />
+
+              {currentImages.length >
+              0 ? (
+                <div className="mt-6">
+                  <div
+                    className="
+                      mb-3
+
+                      flex
+                      items-center
+                      justify-between
+                      gap-3
+                    "
+                  >
+                    <p
+                      className="
+                        text-sm
+                        font-bold
+                        text-[#4B4550]
+                      "
+                    >
+                      Current
+                      Images
+                    </p>
+
+                    <span
+                      className="
+                        text-[10px]
+                        font-semibold
+                        text-[#918996]
+
+                        sm:text-xs
+                      "
+                    >
+                      {
+                        currentImages.length
+                      }{" "}
+                      image
+                      {currentImages.length ===
+                      1
+                        ? ""
+                        : "s"}
+                    </span>
+                  </div>
+
+                  <div
+                    className="
+                      grid
+                      grid-cols-2
+                      gap-3
+
+                      sm:grid-cols-3
+
+                      lg:grid-cols-4
+                    "
+                  >
+                    {currentImages.map(
+                      (
+                        image,
+                        index
+                      ) => (
+                        <div
+                          key={
+                            image +
+                            index
+                          }
+                          className="
+                            group
+                            relative
+
+                            aspect-square
+
+                            overflow-hidden
+
+                            rounded-2xl
+
+                            border
+                            border-[#E7E0EC]
+
+                            bg-[#F8F5FA]
+
+                            shadow-sm
+
+                            transition-all
+                            duration-300
+
+                            hover:-translate-y-1
+                            hover:border-[#D5C8EF]
+                            hover:shadow-lg
+                          "
+                        >
+                          <img
+                            src={
+                              image
+                            }
+                            alt={`Current ${
+                              index +
+                              1
+                            }`}
+                            className="
+                              h-full
+                              w-full
+
+                              object-cover
+
+                              transition-transform
+                              duration-500
+
+                              group-hover:scale-105
+                            "
+                          />
+
+                          <span
+                            className="
+                              absolute
+                              bottom-2
+                              left-2
+
+                              rounded-lg
+
+                              bg-[#2F3136]/80
+
+                              px-2
+                              py-1
+
+                              text-[9px]
+                              font-bold
+                              text-white
+
+                              backdrop-blur-md
+                            "
+                          >
+                            {index ===
+                            0
+                              ? "Primary"
+                              : `Image ${
+                                  index +
+                                  1
+                                }`}
+                          </span>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div
+                  className="
+                    mt-6
+
+                    rounded-2xl
+
+                    border
+                    border-dashed
+                    border-[#DDD4E8]
+
+                    bg-[#FCFAFD]
+
+                    px-5
+                    py-8
+
+                    text-center
+                  "
+                >
+                  <ImageIcon />
+
+                  <p
+                    className="
+                      mt-3
+                      text-sm
+                      font-semibold
+                      text-[#827A87]
+                    "
+                  >
+                    No current
+                    product images
+                    are available.
+                  </p>
+                </div>
+              )}
+            </section>
+
+            {/* =============================================
+                REPLACE IMAGES
+            ============================================= */}
+
+            <section
+              className="
+                mt-8
+
+                border-t
+                border-[#EEE9F2]
+
+                pt-7
+              "
+            >
+              <SectionTitle
+                eyebrow="03 · Refresh Imagery"
+                title="Replace Product Gallery"
+                description="Choose a new complete image set only when you want to replace the product's current gallery."
+                icon={
+                  <UploadIcon />
+                }
+              />
+
+              <div className="mt-6">
+                <div
+                  className="
+                    mb-2
+
+                    flex
+                    flex-col
+                    gap-1
+
+                    sm:flex-row
+                    sm:items-center
+                    sm:justify-between
+                  "
+                >
+                  <label
+                    className={
+                      labelClass
+                    }
+                  >
+                    Replacement
+                    Images
+                  </label>
+
+                  <span
+                    className="
+                      text-[10px]
+                      font-semibold
+                      text-[#918996]
+
+                      sm:text-xs
+                    "
+                  >
+                    {
+                      images.length
+                    }
+                    /6 selected
+                  </span>
+                </div>
+
+                <label
+                  className={`
+                    group
+                    relative
+
+                    flex
+                    min-h-[190px]
+                    w-full
+                    flex-col
+                    items-center
+                    justify-center
+
+                    overflow-hidden
+
+                    rounded-[22px]
+
+                    border-2
+                    border-dashed
+
+                    px-5
+                    py-7
+
+                    text-center
+
+                    transition-all
+                    duration-300
+
+                    ${
+                      isUpdating
+                        ? "cursor-not-allowed border-[#E1DDE5] bg-[#F4F2F5]"
+                        : "cursor-pointer border-[#D9CFF1] bg-gradient-to-br from-[#FAF8FF] via-white to-[#FFF7FA] hover:border-[#B8A1FF] hover:shadow-[0_12px_32px_rgba(108,92,231,0.07)]"
+                    }
+                  `}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    disabled={
+                      isUpdating
+                    }
+                    onChange={
+                      handleImageChange
+                    }
+                    className="hidden"
+                  />
+
+                  <div
+                    className="
+                      pointer-events-none
+
+                      absolute
+                      -right-16
+                      -top-16
+
+                      h-40
+                      w-40
+
+                      rounded-full
+
+                      bg-[#B8A1FF]/12
+
+                      blur-3xl
+                    "
+                  />
+
+                  <div
+                    className="
+                      pointer-events-none
+
+                      absolute
+                      -bottom-16
+                      -left-16
+
+                      h-40
+                      w-40
+
+                      rounded-full
+
+                      bg-[#F2B8C6]/10
+
+                      blur-3xl
+                    "
+                  />
+
+                  <div
+                    className="
+                      relative
+
+                      flex
+                      h-14
+                      w-14
+                      items-center
+                      justify-center
+
+                      rounded-2xl
+
+                      bg-gradient-to-br
+                      from-[#6C5CE7]
+                      to-[#B8A1FF]
+
+                      text-white
+
+                      shadow-[0_12px_26px_rgba(108,92,231,0.22)]
 
                       transition-transform
                       duration-300
 
-                      group-hover:rotate-12
+                      group-hover:-translate-y-1
                     "
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
+                    <UploadIcon />
+                  </div>
 
-                  Update Product
-                </>
+                  <p
+                    className="
+                      relative
+                      mt-4
+
+                      text-sm
+                      font-extrabold
+                      text-[#3F3944]
+
+                      sm:text-base
+                    "
+                  >
+                    Select a new
+                    Velmora image
+                    collection
+                  </p>
+
+                  <p
+                    className="
+                      relative
+
+                      mt-1
+
+                      max-w-md
+
+                      text-[10px]
+                      leading-5
+
+                      text-[#918A96]
+
+                      sm:text-xs
+                    "
+                  >
+                    PNG, JPG,
+                    JPEG or WEBP
+                    · Maximum
+                    5MB each · Up
+                    to 6 images
+                  </p>
+
+                  <div
+                    className="
+                      relative
+
+                      mt-4
+
+                      rounded-full
+
+                      border
+                      border-[#F0DCC0]
+
+                      bg-[#FFF9EF]
+
+                      px-3
+                      py-1.5
+
+                      text-[9px]
+                      font-bold
+
+                      text-[#A47A3E]
+                    "
+                  >
+                    Leave empty to
+                    keep current
+                    images
+                  </div>
+                </label>
+              </div>
+
+              {/* NEW IMAGE NOTICE */}
+
+              {newImagePreviews.length >
+                0 && (
+                <div
+                  className="
+                    mt-5
+
+                    rounded-2xl
+
+                    border
+                    border-[#F1DFC2]
+
+                    bg-[#FFF9EF]
+
+                    px-4
+                    py-3
+                  "
+                >
+                  <div
+                    className="
+                      flex
+                      items-start
+                      justify-between
+                      gap-3
+                    "
+                  >
+                    <div>
+                      <p
+                        className="
+                          text-xs
+                          font-bold
+                          text-[#8E652D]
+                        "
+                      >
+                        Replacement
+                        gallery
+                        selected
+                      </p>
+
+                      <p
+                        className="
+                          mt-1
+                          text-[10px]
+                          leading-5
+                          text-[#A58150]
+
+                          sm:text-xs
+                        "
+                      >
+                        Saving the
+                        product will
+                        replace all
+                        current images
+                        with these new
+                        images.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={
+                        isUpdating
+                      }
+                      onClick={
+                        clearReplacementImages
+                      }
+                      className="
+                        shrink-0
+
+                        text-[10px]
+                        font-bold
+
+                        text-[#9A6930]
+
+                        hover:underline
+
+                        disabled:opacity-50
+                      "
+                    >
+                      Keep Current
+                    </button>
+                  </div>
+                </div>
               )}
-            </button>
-          </div>
-        </form>
-      </div>
 
-      {/* =================================================
-          ANIMATION
-      ================================================= */}
+              {/* NEW PREVIEWS */}
 
-      <style>
-        {`
-          @keyframes editProductEnter {
+              {newImagePreviews.length >
+                0 && (
+                <div className="mt-5">
+                  <div
+                    className="
+                      mb-3
+
+                      flex
+                      items-center
+                      justify-between
+                      gap-3
+                    "
+                  >
+                    <p
+                      className="
+                        text-sm
+                        font-bold
+                        text-[#4B4550]
+                      "
+                    >
+                      New Gallery
+                      Preview
+                    </p>
+
+                    <span
+                      className="
+                        text-[10px]
+                        font-semibold
+                        text-[#B07E3F]
+                      "
+                    >
+                      Replaces
+                      current
+                    </span>
+                  </div>
+
+                  <div
+                    className="
+                      grid
+                      grid-cols-2
+                      gap-3
+
+                      sm:grid-cols-3
+
+                      lg:grid-cols-4
+                    "
+                  >
+                    {newImagePreviews.map(
+                      (
+                        preview,
+                        index
+                      ) => (
+                        <div
+                          key={
+                            preview
+                          }
+                          className="
+                            group
+                            relative
+
+                            aspect-square
+
+                            overflow-hidden
+
+                            rounded-2xl
+
+                            border
+                            border-[#DDD2F3]
+
+                            bg-[#F8F5FA]
+
+                            shadow-sm
+
+                            transition-all
+                            duration-300
+
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                          "
+                        >
+                          <img
+                            src={
+                              preview
+                            }
+                            alt={`New preview ${
+                              index +
+                              1
+                            }`}
+                            className="
+                              h-full
+                              w-full
+
+                              object-cover
+
+                              transition-transform
+                              duration-500
+
+                              group-hover:scale-105
+                            "
+                          />
+
+                          <span
+                            className="
+                              absolute
+                              bottom-2
+                              left-2
+
+                              rounded-lg
+
+                              bg-[#6C5CE7]/90
+
+                              px-2
+                              py-1
+
+                              text-[9px]
+                              font-bold
+                              text-white
+
+                              backdrop-blur-md
+                            "
+                          >
+                            {index ===
+                            0
+                              ? "New Primary"
+                              : `New ${
+                                  index +
+                                  1
+                                }`}
+                          </span>
+
+                          {!isUpdating && (
+                            <button
+                              type="button"
+                              aria-label={`Remove new image ${
+                                index +
+                                1
+                              }`}
+                              onClick={() =>
+                                removeNewImage(
+                                  index
+                                )
+                              }
+                              className="
+                                absolute
+                                right-2
+                                top-2
+
+                                flex
+                                h-9
+                                w-9
+                                items-center
+                                justify-center
+
+                                rounded-full
+
+                                border
+                                border-white
+
+                                bg-white/90
+
+                                text-[#B45462]
+
+                                shadow-md
+
+                                backdrop-blur-md
+
+                                transition-all
+
+                                hover:bg-[#FFF0F3]
+
+                                active:scale-90
+                              "
+                            >
+                              <CloseIcon />
+                            </button>
+                          )}
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
+            </section>
+
+            {/* =============================================
+                PRICING / STOCK
+            ============================================= */}
+
+            <section
+              className="
+                mt-8
+
+                border-t
+                border-[#EEE9F2]
+
+                pt-7
+              "
+            >
+              <SectionTitle
+                eyebrow="04 · Commercial Details"
+                title="Pricing & Inventory"
+                description="Update the selling price, reference price and stock available to Velmora customers."
+                icon={
+                  <PriceIcon />
+                }
+              />
+
+              <div
+                className="
+                  mt-6
+
+                  grid
+                  grid-cols-1
+                  gap-5
+
+                  sm:grid-cols-2
+                "
+              >
+                {/* LABEL PRICE */}
+
+                <div>
+                  <label
+                    className={
+                      labelClass
+                    }
+                  >
+                    Original /
+                    Label Price
+                  </label>
+
+                  <div className="relative">
+                    <span
+                      className="
+                        absolute
+                        left-4
+                        top-1/2
+
+                        -translate-y-1/2
+
+                        text-sm
+                        font-bold
+                        text-[#8D8491]
+                      "
+                    >
+                      Rs.
+                    </span>
+
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={
+                        labelPrice
+                      }
+                      disabled={
+                        isUpdating
+                      }
+                      onChange={(
+                        event
+                      ) =>
+                        setLabelPrice(
+                          event.target
+                            .value
+                        )
+                      }
+                      className={`
+                        ${inputClass}
+                        pl-12
+                      `}
+                    />
+                  </div>
+                </div>
+
+                {/* SELLING PRICE */}
+
+                <div>
+                  <label
+                    className={
+                      labelClass
+                    }
+                  >
+                    Selling Price
+                  </label>
+
+                  <div className="relative">
+                    <span
+                      className="
+                        absolute
+                        left-4
+                        top-1/2
+
+                        -translate-y-1/2
+
+                        text-sm
+                        font-bold
+                        text-[#8D8491]
+                      "
+                    >
+                      Rs.
+                    </span>
+
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={
+                        price
+                      }
+                      disabled={
+                        isUpdating
+                      }
+                      onChange={(
+                        event
+                      ) =>
+                        setPrice(
+                          event.target
+                            .value
+                        )
+                      }
+                      className={`
+                        ${inputClass}
+                        pl-12
+                      `}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* DISCOUNT */}
+
+              {discountPercentage >
+                0 && (
+                <div
+                  className="
+                    mt-4
+
+                    flex
+                    items-center
+                    gap-3
+
+                    rounded-2xl
+
+                    border
+                    border-[#F0D7DF]
+
+                    bg-[#FFF4F7]
+
+                    px-4
+                    py-3
+                  "
+                >
+                  <div
+                    className="
+                      flex
+                      h-9
+                      w-9
+                      shrink-0
+                      items-center
+                      justify-center
+
+                      rounded-xl
+
+                      bg-white
+
+                      text-xs
+                      font-black
+                      text-[#B46079]
+
+                      shadow-sm
+                    "
+                  >
+                    %
+                  </div>
+
+                  <div>
+                    <p
+                      className="
+                        text-sm
+                        font-bold
+                        text-[#824D5D]
+                      "
+                    >
+                      {
+                        discountPercentage
+                      }
+                      % customer
+                      saving
+                    </p>
+
+                    <p
+                      className="
+                        mt-0.5
+                        text-[10px]
+                        text-[#A47A87]
+                      "
+                    >
+                      Based on the
+                      current
+                      original and
+                      selling
+                      prices.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* STOCK */}
+
+              <div className="mt-5">
+                <label
+                  className={
+                    labelClass
+                  }
+                >
+                  Stock Quantity
+                </label>
+
+                <input
+                  type="number"
+                  min="0"
+                  value={stock}
+                  disabled={
+                    isUpdating
+                  }
+                  onChange={(
+                    event
+                  ) =>
+                    setStock(
+                      event.target
+                        .value
+                    )
+                  }
+                  className={
+                    inputClass
+                  }
+                />
+
+                <div className="mt-2">
+                  {stockNumber <=
+                  0 ? (
+                    <span
+                      className="
+                        inline-flex
+
+                        rounded-full
+
+                        border
+                        border-[#F0D4D9]
+
+                        bg-[#FFF1F3]
+
+                        px-3
+                        py-1.5
+
+                        text-[10px]
+                        font-bold
+                        text-[#B45462]
+                      "
+                    >
+                      Out of Stock
+                    </span>
+                  ) : stockNumber <=
+                    5 ? (
+                    <span
+                      className="
+                        inline-flex
+
+                        rounded-full
+
+                        border
+                        border-[#F1DFC0]
+
+                        bg-[#FFF8EC]
+
+                        px-3
+                        py-1.5
+
+                        text-[10px]
+                        font-bold
+                        text-[#A87328]
+                      "
+                    >
+                      {stockNumber} ·
+                      Low Stock
+                    </span>
+                  ) : (
+                    <span
+                      className="
+                        inline-flex
+
+                        rounded-full
+
+                        border
+                        border-[#D5E9DF]
+
+                        bg-[#EDF7F2]
+
+                        px-3
+                        py-1.5
+
+                        text-[10px]
+                        font-bold
+                        text-[#478465]
+                      "
+                    >
+                      {stockNumber}{" "}
+                      Available
+                    </span>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* =============================================
+                ACTIONS
+            ============================================= */}
+
+            <div
+              className="
+                mt-8
+
+                flex
+                flex-col-reverse
+                gap-3
+
+                border-t
+                border-[#EEE9F2]
+
+                pt-6
+
+                sm:flex-row
+                sm:justify-end
+              "
+            >
+              <Link
+                to="/admin/products"
+                className={`
+                  flex
+                  min-h-[50px]
+                  w-full
+                  items-center
+                  justify-center
+
+                  rounded-xl
+
+                  border
+                  border-[#DCD5E2]
+
+                  bg-white
+
+                  px-6
+
+                  text-sm
+                  font-bold
+                  text-[#625C68]
+
+                  transition-all
+
+                  hover:border-[#CFC5D8]
+                  hover:bg-[#F8F6F9]
+
+                  active:scale-[0.98]
+
+                  sm:w-auto
+
+                  ${
+                    isUpdating
+                      ? "pointer-events-none opacity-50"
+                      : ""
+                  }
+                `}
+              >
+                Cancel
+              </Link>
+
+              <button
+                type="submit"
+                disabled={
+                  isUpdating
+                }
+                className="
+                  group
+
+                  flex
+                  min-h-[50px]
+                  w-full
+                  min-w-[190px]
+                  items-center
+                  justify-center
+                  gap-2
+
+                  rounded-xl
+
+                  bg-gradient-to-r
+                  from-[#6C5CE7]
+                  to-[#8F78EA]
+
+                  px-7
+
+                  text-sm
+                  font-bold
+                  text-white
+
+                  shadow-[0_10px_25px_rgba(108,92,231,0.22)]
+
+                  transition-all
+                  duration-300
+
+                  hover:-translate-y-0.5
+                  hover:shadow-[0_15px_32px_rgba(108,92,231,0.30)]
+
+                  active:scale-[0.98]
+
+                  disabled:cursor-not-allowed
+                  disabled:opacity-60
+                  disabled:hover:translate-y-0
+
+                  sm:w-auto
+                "
+              >
+                {isUpdating ? (
+                  <>
+                    <span
+                      className="
+                        h-5
+                        w-5
+
+                        animate-spin
+
+                        rounded-full
+
+                        border-2
+                        border-white/35
+                        border-t-white
+                      "
+                    />
+
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <EditIcon />
+
+                    Update Velmora
+                    Product
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+
+          {/* =================================================
+              LIVE PREVIEW
+          ================================================= */}
+
+          <aside
+            className="
+              min-w-0
+
+              xl:sticky
+              xl:top-6
+            "
+          >
+            <div
+              className="
+                overflow-hidden
+
+                rounded-[26px]
+
+                border
+                border-[#E8E1EF]
+
+                bg-white
+
+                shadow-[0_18px_55px_rgba(63,48,84,0.06)]
+              "
+            >
+              {/* PREVIEW HEADER */}
+
+              <div
+                className="
+                  border-b
+                  border-[#EEE9F2]
+
+                  bg-gradient-to-r
+                  from-[#F5F1FF]
+                  via-white
+                  to-[#FFF3F7]
+
+                  px-5
+                  py-4
+                "
+              >
+                <p
+                  className="
+                    text-[9px]
+                    font-black
+                    uppercase
+                    tracking-[0.18em]
+
+                    text-[#6C5CE7]
+                  "
+                >
+                  Live Preview
+                </p>
+
+                <h3
+                  className="
+                    mt-1
+                    font-extrabold
+                    text-[#332E37]
+                  "
+                >
+                  Updated Velmora
+                  Listing
+                </h3>
+
+                <p
+                  className="
+                    mt-1
+                    text-[10px]
+                    leading-5
+                    text-[#918996]
+                  "
+                >
+                  Preview the
+                  product while
+                  refining its
+                  information.
+                </p>
+              </div>
+
+              {/* IMAGE */}
+
+              <div
+                className="
+                  relative
+
+                  flex
+                  aspect-[1.15/1]
+                  items-center
+                  justify-center
+
+                  overflow-hidden
+
+                  bg-gradient-to-br
+                  from-[#FAF8FF]
+                  via-[#F8F4FF]
+                  to-[#FFF4F7]
+
+                  p-5
+                "
+              >
+                <div
+                  className="
+                    pointer-events-none
+
+                    absolute
+                    left-1/2
+                    top-1/2
+
+                    h-40
+                    w-40
+
+                    -translate-x-1/2
+                    -translate-y-1/2
+
+                    rounded-full
+
+                    bg-[#B8A1FF]/15
+
+                    blur-[50px]
+                  "
+                />
+
+                {mainPreviewImage ? (
+                  <img
+                    src={
+                      mainPreviewImage
+                    }
+                    alt={
+                      name ||
+                      "Velmora product"
+                    }
+                    className="
+                      relative
+                      z-10
+
+                      h-full
+                      w-full
+
+                      object-contain
+                    "
+                  />
+                ) : (
+                  <div
+                    className="
+                      relative
+                      z-10
+                      text-center
+                    "
+                  >
+                    <div
+                      className="
+                        mx-auto
+
+                        flex
+                        h-14
+                        w-14
+                        items-center
+                        justify-center
+
+                        rounded-2xl
+
+                        bg-white
+
+                        text-[#8E78DD]
+
+                        shadow-md
+                      "
+                    >
+                      <ImageIcon />
+                    </div>
+
+                    <p
+                      className="
+                        mt-3
+                        text-xs
+                        font-semibold
+                        text-[#948C99]
+                      "
+                    >
+                      Product image
+                      preview
+                    </p>
+                  </div>
+                )}
+
+                {discountPercentage >
+                  0 && (
+                  <span
+                    className="
+                      absolute
+                      left-3
+                      top-3
+                      z-20
+
+                      rounded-full
+
+                      border
+                      border-[#F1D5DE]
+
+                      bg-[#FFF2F6]
+
+                      px-2.5
+                      py-1.5
+
+                      text-[9px]
+                      font-black
+                      text-[#B45D77]
+                    "
+                  >
+                    Save{" "}
+                    {
+                      discountPercentage
+                    }
+                    %
+                  </span>
+                )}
+
+                {newImagePreviews.length >
+                  0 && (
+                  <span
+                    className="
+                      absolute
+                      bottom-3
+                      right-3
+                      z-20
+
+                      rounded-full
+
+                      border
+                      border-[#DFD6F7]
+
+                      bg-white/90
+
+                      px-2.5
+                      py-1.5
+
+                      text-[8px]
+                      font-black
+                      uppercase
+                      tracking-[0.1em]
+
+                      text-[#6C5CE7]
+
+                      shadow-sm
+
+                      backdrop-blur-md
+                    "
+                  >
+                    New Gallery
+                  </span>
+                )}
+              </div>
+
+              {/* PRODUCT INFO */}
+
+              <div className="p-5">
+                <p
+                  className="
+                    text-[9px]
+                    font-black
+                    uppercase
+                    tracking-[0.18em]
+
+                    text-[#927CE4]
+                  "
+                >
+                  Velmora
+                  Selection
+                </p>
+
+                <h4
+                  className="
+                    mt-2
+
+                    line-clamp-2
+
+                    text-lg
+                    font-extrabold
+                    leading-snug
+                    tracking-[-0.02em]
+
+                    text-[#2F3136]
+                  "
+                >
+                  {name.trim() ||
+                    "Velmora Product"}
+                </h4>
+
+                <p
+                  className="
+                    mt-2
+
+                    line-clamp-3
+
+                    text-xs
+                    leading-6
+
+                    text-[#7A7380]
+                  "
+                >
+                  {description.trim() ||
+                    "Your refined product description will appear here."}
+                </p>
+
+                <div
+                  className="
+                    mt-4
+
+                    flex
+                    flex-wrap
+                    items-end
+                    gap-2
+                  "
+                >
+                  <span
+                    className="
+                      text-xl
+                      font-extrabold
+                      tracking-[-0.025em]
+
+                      text-[#6C5CE7]
+                    "
+                  >
+                    Rs.{" "}
+                    {Number(
+                      price || 0
+                    ).toLocaleString(
+                      "en-LK",
+                      {
+                        minimumFractionDigits:
+                          2,
+                        maximumFractionDigits:
+                          2,
+                      }
+                    )}
+                  </span>
+
+                  {Number(
+                    labelPrice
+                  ) >
+                    Number(
+                      price
+                    ) && (
+                    <span
+                      className="
+                        pb-[2px]
+
+                        text-xs
+                        text-[#A59DA8]
+                        line-through
+                      "
+                    >
+                      Rs.{" "}
+                      {Number(
+                        labelPrice
+                      ).toLocaleString(
+                        "en-LK",
+                        {
+                          minimumFractionDigits:
+                            2,
+                          maximumFractionDigits:
+                            2,
+                        }
+                      )}
+                    </span>
+                  )}
+                </div>
+
+                {/* INVENTORY */}
+
+                <div
+                  className="
+                    mt-4
+
+                    flex
+                    items-center
+                    justify-between
+                    gap-3
+
+                    rounded-xl
+
+                    bg-[#F8F5FF]
+
+                    px-3
+                    py-2.5
+                  "
+                >
+                  <span
+                    className="
+                      text-[10px]
+                      font-semibold
+                      text-[#7B7380]
+                    "
+                  >
+                    Inventory
+                  </span>
+
+                  <span
+                    className={`
+                      text-[10px]
+                      font-bold
+
+                      ${
+                        stockNumber <=
+                        0
+                          ? "text-[#B45462]"
+                          : stockNumber <=
+                            5
+                          ? "text-[#A87328]"
+                          : "text-[#4F8F70]"
+                      }
+                    `}
+                  >
+                    {stockNumber <=
+                    0
+                      ? "Out of Stock"
+                      : stockNumber <=
+                        5
+                      ? `${stockNumber} Low Stock`
+                      : `${stockNumber} Available`}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* =================================================
+                UPDATE CHECKLIST
+            ================================================= */}
+
+            <div
+              className="
+                mt-5
+
+                rounded-[24px]
+
+                border
+                border-[#E8E1EF]
+
+                bg-white
+
+                p-5
+
+                shadow-[0_14px_42px_rgba(63,48,84,0.045)]
+              "
+            >
+              <p
+                className="
+                  text-[9px]
+                  font-black
+                  uppercase
+                  tracking-[0.18em]
+
+                  text-[#6C5CE7]
+                "
+              >
+                Update Checklist
+              </p>
+
+              <h3
+                className="
+                  mt-1
+                  font-extrabold
+                  text-[#332E37]
+                "
+              >
+                Ready to save?
+              </h3>
+
+              <div
+                className="
+                  mt-4
+                  space-y-3
+                "
+              >
+                <ChecklistItem
+                  label="Product name"
+                  ready={Boolean(
+                    name.trim()
+                  )}
+                />
+
+                <ChecklistItem
+                  label="Description"
+                  ready={Boolean(
+                    description.trim()
+                  )}
+                />
+
+                <ChecklistItem
+                  label="Product imagery"
+                  ready={
+                    previewImages.length >
+                    0
+                  }
+                />
+
+                <ChecklistItem
+                  label="Valid pricing"
+                  ready={
+                    Number(price) >=
+                      0 &&
+                    Number(
+                      labelPrice
+                    ) >= 0
+                  }
+                />
+
+                <ChecklistItem
+                  label="Inventory value"
+                  ready={
+                    stockNumber >=
+                    0
+                  }
+                />
+              </div>
+            </div>
+
+            {/* =================================================
+                BRAND NOTE
+            ================================================= */}
+
+            <div
+              className="
+                relative
+
+                mt-5
+
+                overflow-hidden
+
+                rounded-[24px]
+
+                bg-[#302C3C]
+
+                p-5
+
+                text-white
+
+                shadow-[0_18px_44px_rgba(47,44,60,0.18)]
+              "
+            >
+              <div
+                className="
+                  pointer-events-none
+
+                  absolute
+                  -right-14
+                  -top-14
+
+                  h-32
+                  w-32
+
+                  rounded-full
+
+                  bg-[#B8A1FF]/18
+
+                  blur-3xl
+                "
+              />
+
+              <div
+                className="
+                  relative
+
+                  flex
+                  h-10
+                  w-10
+                  items-center
+                  justify-center
+
+                  rounded-xl
+
+                  bg-white/10
+
+                  text-[#EADBC8]
+                "
+              >
+                ✦
+              </div>
+
+              <p
+                className="
+                  relative
+
+                  mt-4
+
+                  text-[9px]
+                  font-black
+                  uppercase
+                  tracking-[0.18em]
+
+                  text-[#D2C6FF]
+                "
+              >
+                Velmora Standard
+              </p>
+
+              <h3
+                className="
+                  relative
+
+                  mt-1
+                  font-extrabold
+                "
+              >
+                Refine, don't
+                overcomplicate.
+              </h3>
+
+              <p
+                className="
+                  relative
+
+                  mt-2
+
+                  text-xs
+                  leading-6
+
+                  text-white/55
+                "
+              >
+                Keep product
+                names clear,
+                imagery elegant
+                and descriptions
+                concise so every
+                Velmora listing
+                feels consistent.
+              </p>
+            </div>
+          </aside>
+        </div>
+
+        {/* =================================================
+            ANIMATION
+        ================================================= */}
+
+        <style>{`
+          @keyframes velmoraEditEnter {
             from {
               opacity: 0;
               transform: translateY(10px);
@@ -2006,8 +3461,75 @@ export default function EditProductPage() {
               transform: translateY(0);
             }
           }
+
+          @media (prefers-reduced-motion: reduce) {
+            .animate-\\[velmoraEditEnter_0\\.4s_ease-out\\] {
+              animation: none !important;
+            }
+          }
+        `}</style>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================
+   CHECKLIST ITEM
+========================================================= */
+
+function ChecklistItem({
+  label,
+  ready,
+}) {
+  return (
+    <div
+      className="
+        flex
+        items-center
+        gap-3
+      "
+    >
+      <div
+        className={`
+          flex
+          h-7
+          w-7
+          shrink-0
+          items-center
+          justify-center
+
+          rounded-full
+
+          ${
+            ready
+              ? "bg-[#EDF7F2] text-[#4F8F70]"
+              : "bg-[#F0ECF2] text-[#A69EA9]"
+          }
         `}
-      </style>
+      >
+        {ready ? (
+          <CheckIcon />
+        ) : (
+          <span className="text-[9px]">
+            •
+          </span>
+        )}
+      </div>
+
+      <span
+        className={`
+          text-xs
+          font-semibold
+
+          ${
+            ready
+              ? "text-[#514A56]"
+              : "text-[#99919D]"
+          }
+        `}
+      >
+        {label}
+      </span>
     </div>
   );
 }
