@@ -384,6 +384,79 @@ export default function AdminOrderPage() {
     }
   }
 
+  function getPaymentMethodLabel(
+    method
+  ) {
+    const value = String(
+      method || ""
+    )
+      .trim()
+      .toLowerCase();
+
+    if (value === "card") {
+      return "Card Payment";
+    }
+
+    if (
+      value ===
+      "cash_on_delivery"
+    ) {
+      return "Cash on Delivery";
+    }
+
+    // Existing orders created before payment fields were added
+    // are treated as COD for display only.
+    return "Cash on Delivery";
+  }
+
+  function getPaymentStatusClass(
+    status
+  ) {
+    const value = String(
+      status || "pending"
+    )
+      .trim()
+      .toLowerCase();
+
+    switch (value) {
+      case "paid":
+        return "bg-[#EDF7F2] text-[#478465] border-[#D5E9DF]";
+
+      case "failed":
+        return "bg-[#FFF1F3] text-[#B45462] border-[#F1D4D9]";
+
+      case "refunded":
+        return "bg-[#F7F1FF] text-[#8267D8] border-[#E3D9FA]";
+
+      default:
+        return "bg-[#FFF8EC] text-[#A87328] border-[#F1DFC0]";
+    }
+  }
+
+  function getPaymentStatusLabel(
+    status
+  ) {
+    const value = String(
+      status || "pending"
+    )
+      .trim()
+      .toLowerCase();
+
+    if (value === "paid") {
+      return "Paid";
+    }
+
+    if (value === "failed") {
+      return "Failed";
+    }
+
+    if (value === "refunded") {
+      return "Refunded";
+    }
+
+    return "Pending";
+  }
+
   /* =====================================================
      FETCH ORDERS
   ===================================================== */
@@ -919,6 +992,26 @@ export default function AdminOrderPage() {
       [
         "Status",
         selectedOrder.status ||
+          "-",
+      ],
+
+      [
+        "Payment Method",
+        getPaymentMethodLabel(
+          selectedOrder.paymentMethod
+        ),
+      ],
+
+      [
+        "Payment Status",
+        getPaymentStatusLabel(
+          selectedOrder.paymentStatus
+        ),
+      ],
+
+      [
+        "Payment Ref",
+        selectedOrder.paymentReference ||
           "-",
       ],
     ];
@@ -1812,6 +1905,228 @@ export default function AdminOrderPage() {
                     </span>
                   </div>
                 </div>
+
+                {/* =========================================
+                    PAYMENT INFORMATION
+                ========================================= */}
+
+                <section
+                  className="
+                    mb-5
+
+                    rounded-[22px]
+
+                    border
+                    border-[#E7E0EE]
+
+                    bg-gradient-to-br
+                    from-[#FBF9FF]
+                    via-white
+                    to-[#FFF8FA]
+
+                    p-4
+
+                    sm:p-5
+                  "
+                >
+                  <div
+                    className="
+                      mb-4
+
+                      flex
+                      items-center
+                      gap-3
+                    "
+                  >
+                    <div
+                      className="
+                        flex
+                        h-10
+                        w-10
+                        shrink-0
+                        items-center
+                        justify-center
+
+                        rounded-xl
+
+                        bg-[#F2EDFF]
+
+                        text-[#6C5CE7]
+                      "
+                    >
+                      <span className="text-lg">
+                        💳
+                      </span>
+                    </div>
+
+                    <div>
+                      <p
+                        className="
+                          text-[9px]
+                          font-black
+                          uppercase
+                          tracking-[0.16em]
+                          text-[#927CE4]
+                        "
+                      >
+                        Payment
+                      </p>
+
+                      <h3
+                        className="
+                          mt-0.5
+                          font-extrabold
+                          text-[#39333E]
+                        "
+                      >
+                        Payment Information
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div
+                    className="
+                      grid
+                      grid-cols-1
+                      gap-3
+
+                      sm:grid-cols-2
+
+                      lg:grid-cols-3
+                    "
+                  >
+                    <div
+                      className="
+                        rounded-2xl
+
+                        border
+                        border-[#EAE4EF]
+
+                        bg-white
+
+                        p-4
+                      "
+                    >
+                      <p
+                        className="
+                          text-[10px]
+                          font-semibold
+                          text-[#9B939F]
+                        "
+                      >
+                        Payment Method
+                      </p>
+
+                      <p
+                        className="
+                          mt-1.5
+
+                          break-words
+
+                          text-sm
+                          font-bold
+                          text-[#57505C]
+                        "
+                      >
+                        {getPaymentMethodLabel(
+                          selectedOrder.paymentMethod
+                        )}
+                      </p>
+                    </div>
+
+                    <div
+                      className="
+                        rounded-2xl
+
+                        border
+                        border-[#EAE4EF]
+
+                        bg-white
+
+                        p-4
+                      "
+                    >
+                      <p
+                        className="
+                          text-[10px]
+                          font-semibold
+                          text-[#9B939F]
+                        "
+                      >
+                        Payment Status
+                      </p>
+
+                      <span
+                        className={`
+                          mt-2
+
+                          inline-flex
+                          items-center
+
+                          rounded-full
+
+                          border
+
+                          px-3
+                          py-1.5
+
+                          text-[10px]
+                          font-bold
+
+                          ${getPaymentStatusClass(
+                            selectedOrder.paymentStatus
+                          )}
+                        `}
+                      >
+                        {getPaymentStatusLabel(
+                          selectedOrder.paymentStatus
+                        )}
+                      </span>
+                    </div>
+
+                    <div
+                      className="
+                        rounded-2xl
+
+                        border
+                        border-[#EAE4EF]
+
+                        bg-white
+
+                        p-4
+
+                        sm:col-span-2
+                        lg:col-span-1
+                      "
+                    >
+                      <p
+                        className="
+                          text-[10px]
+                          font-semibold
+                          text-[#9B939F]
+                        "
+                      >
+                        Payment Reference
+                      </p>
+
+                      <p
+                        className="
+                          mt-1.5
+
+                          break-all
+
+                          text-xs
+                          font-semibold
+                          leading-5
+                          text-[#625B67]
+                        "
+                      >
+                        {selectedOrder.paymentReference ||
+                          "Not available"}
+                      </p>
+                    </div>
+                  </div>
+                </section>
 
                 {/* =========================================
                     UPDATE STATUS
@@ -3001,7 +3316,7 @@ export default function AdminOrderPage() {
             className="
               hidden
 
-              grid-cols-[110px_1.1fr_1.4fr_1fr_1.1fr_1.2fr_110px_110px]
+              grid-cols-[110px_1.05fr_1.3fr_0.9fr_1.05fr_1.15fr_110px_120px_100px_105px]
               gap-4
 
               border-b
@@ -3047,6 +3362,14 @@ export default function AdminOrderPage() {
 
             <div>
               Total
+            </div>
+
+            <div>
+              Payment
+            </div>
+
+            <div>
+              Pay Status
             </div>
 
             <div>
@@ -3215,6 +3538,50 @@ export default function AdminOrderPage() {
                         )}`}
                         highlight
                       />
+
+                      <OrderDetail
+                        label="Payment Method"
+                        value={getPaymentMethodLabel(
+                          item.paymentMethod
+                        )}
+                      />
+
+                      <div className="min-w-0">
+                        <p
+                          className="
+                            text-[10px]
+                            text-[#9B939F]
+                          "
+                        >
+                          Payment Status
+                        </p>
+
+                        <span
+                          className={`
+                            mt-1
+
+                            inline-flex
+
+                            rounded-full
+
+                            border
+
+                            px-2.5
+                            py-1
+
+                            text-[10px]
+                            font-bold
+
+                            ${getPaymentStatusClass(
+                              item.paymentStatus
+                            )}
+                          `}
+                        >
+                          {getPaymentStatusLabel(
+                            item.paymentStatus
+                          )}
+                        </span>
+                      </div>
                     </div>
 
                     <div
@@ -3290,7 +3657,7 @@ export default function AdminOrderPage() {
                     className="
                       hidden
 
-                      grid-cols-[110px_1.1fr_1.4fr_1fr_1.1fr_1.2fr_110px_110px]
+                      grid-cols-[110px_1.05fr_1.3fr_0.9fr_1.05fr_1.15fr_110px_120px_100px_105px]
                       items-center
                       gap-4
 
@@ -3397,6 +3764,44 @@ export default function AdminOrderPage() {
                         item.total
                       )}
                     </p>
+
+                    <p
+                      className="
+                        text-xs
+                        font-semibold
+                        leading-5
+                        text-[#625B67]
+                      "
+                    >
+                      {getPaymentMethodLabel(
+                        item.paymentMethod
+                      )}
+                    </p>
+
+                    <span
+                      className={`
+                        inline-flex
+                        w-fit
+
+                        rounded-full
+
+                        border
+
+                        px-2.5
+                        py-1
+
+                        text-[10px]
+                        font-bold
+
+                        ${getPaymentStatusClass(
+                          item.paymentStatus
+                        )}
+                      `}
+                    >
+                      {getPaymentStatusLabel(
+                        item.paymentStatus
+                      )}
+                    </span>
 
                     <span
                       className={`

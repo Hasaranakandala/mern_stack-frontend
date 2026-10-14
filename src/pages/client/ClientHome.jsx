@@ -35,29 +35,6 @@ import * as THREE from "three";
    Secondary     #6B7280
 ========================================================= */
 
-const categories = [
-  {
-    icon: "✦",
-    title: "Skincare",
-    text: "Thoughtful cleansers, serums and moisturizers for radiant everyday skin.",
-  },
-  {
-    icon: "❀",
-    title: "Haircare",
-    text: "Nourishing essentials created for softer, healthier-looking hair.",
-  },
-  {
-    icon: "◆",
-    title: "Makeup",
-    text: "Modern shades and effortless finishes designed for your unique expression.",
-  },
-  {
-    icon: "♡",
-    title: "Body & Fragrance",
-    text: "Elevated body care and scents that make every routine feel personal.",
-  },
-];
-
 const productColors = [
   "#B8A1FF",
   "#6C5CE7",
@@ -2539,7 +2516,7 @@ export default function ClientHome() {
       </section>
 
       {/* ===================================================
-          CATEGORY + CREAM
+          COLLECTION SHOWCASE + CREAM
       =================================================== */}
 
       <ProductSection
@@ -2552,7 +2529,7 @@ export default function ClientHome() {
         type="cream"
         eyebrow="Curated for every ritual"
         title="Beauty that belongs to you."
-        description="From skincare essentials to expressive makeup and signature body care, explore collections thoughtfully organized around your everyday ritual."
+        description="Discover a thoughtful selection of beauty essentials chosen for self-expression, confidence, and the moments that make every day feel special."
         color={
           creamColor
         }
@@ -2567,105 +2544,79 @@ export default function ClientHome() {
         }
         reverse
       >
-        <div
+        {/* Signature collection editorial — no product categories */}
+        <Link
+          to="/products"
+          aria-label="Discover the Velmora collection"
           className="
+            group
+            relative
+            isolate
             mt-8
-            grid
-            grid-cols-1
-            gap-3
-            sm:grid-cols-2
+            block
+            h-[300px]
+            overflow-hidden
+            rounded-[26px]
+            border
+            border-[#E8DFF4]
+            bg-gradient-to-br
+            from-[#EDE4FF]
+            via-[#E7D5E2]
+            to-[#EADBC8]
+            shadow-[0_18px_45px_rgba(83,58,105,0.10)]
+            transition-all
+            duration-500
+            hover:-translate-y-1
+            hover:shadow-[0_24px_55px_rgba(83,58,105,0.18)]
+            focus:outline-none
+            focus-visible:ring-4
+            focus-visible:ring-[#B8A1FF]
+            sm:h-[340px]
+            lg:h-[355px]
           "
         >
-          {categories.map(
-            (
-              category
-            ) => (
-              <Link
-                key={
-                  category.title
-                }
-                to="/products"
-                className="
-                  group
-                  rounded-2xl
-                  border
-                  border-[#EEE8F8]
-                  bg-white/80
-                  p-4
-                  transition-all
-                  duration-300
-                  hover:-translate-y-1.5
-                  hover:border-[#CFC1FA]
-                  hover:shadow-[0_16px_35px_rgba(108,92,231,0.10)]
-                "
-              >
-                <div
-                  className="
-                    flex
-                    h-10
-                    w-10
-                    items-center
-                    justify-center
-                    rounded-xl
-                    bg-[#F1ECFF]
-                    font-bold
-                    text-[#6C5CE7]
-                    transition-all
-                    duration-300
-                    group-hover:scale-110
-                    group-hover:bg-[#E9E1FF]
-                  "
-                >
-                  {
-                    category.icon
-                  }
-                </div>
-
-                <h3
-                  className="
-                    mt-4
-                    font-extrabold
-                    text-[#2F3136]
-                  "
-                >
-                  {
-                    category.title
-                  }
-                </h3>
-
-                <p
-                  className="
-                    mt-2
-                    text-xs
-                    leading-5
-                    text-[#6B7280]
-                  "
-                >
-                  {
-                    category.text
-                  }
-                </p>
-
-                <span
-                  className="
-                    mt-3
-                    inline-block
-                    text-xs
-                    font-bold
-                    text-[#6C5CE7]
-                    transition-transform
-                    duration-300
-                    group-hover:translate-x-1
-                  "
-                >
-                  Explore
-                  Collection
-                  →
-                </span>
-              </Link>
-            )
-          )}
-        </div>
+          <img
+            src="https://images.unsplash.com/photo-1739980155900-36562bcb7857?auto=format&fit=crop&w=1200&q=85"
+            alt="Elegant beauty essentials arranged together on a marble tray"
+            loading="lazy"
+            onError={(event) => {
+              event.currentTarget.style.display = "none";
+            }}
+            className="
+              absolute
+              inset-0
+              h-full
+              w-full
+              object-cover
+              transition-transform
+              duration-700
+              group-hover:scale-[1.07]
+            "
+          />
+          <div
+            aria-hidden="true"
+            className="
+              absolute
+              inset-0
+              bg-gradient-to-t
+              from-[#2F2545]/90
+              via-[#443657]/40
+              to-transparent
+            "
+          />
+          <div className="absolute bottom-0 left-0 right-0 z-10 p-5 sm:p-7">
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.23em] text-[#EADBC8] sm:text-xs">
+              The Velmora Edit
+            </p>
+            <h3 className="mt-2 max-w-sm text-2xl font-extrabold leading-tight text-white sm:text-3xl">
+              A little luxury, made for you.
+            </h3>
+            <span className="mt-5 inline-flex min-h-[42px] items-center gap-2 rounded-xl bg-white px-5 text-xs font-bold text-[#6C5CE7] shadow-md transition-all duration-300 group-hover:gap-3 group-hover:bg-[#F6F2FF] sm:text-sm">
+              Explore the Collection
+              <span aria-hidden="true">→</span>
+            </span>
+          </div>
+        </Link>
       </ProductSection>
 
       {/* ===================================================

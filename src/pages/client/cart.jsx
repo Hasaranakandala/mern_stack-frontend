@@ -1,1203 +1,1966 @@
 import { useState } from "react";
+
 import {
   getCart,
   removeFromCart,
   addToCart,
 } from "../../utils/cart";
 
-import { Link } from "react-router-dom";
-import { FaTrash } from "react-icons/fa";
-import { BsCart3 } from "react-icons/bs";
+import {
+  Link,
+} from "react-router-dom";
+
+import {
+  FaTrash,
+} from "react-icons/fa";
+
+import {
+  BsCart3,
+} from "react-icons/bs";
+
+import {
+  FiArrowRight,
+  FiCheck,
+  FiPackage,
+  FiShield,
+  FiShoppingBag,
+  FiStar,
+} from "react-icons/fi";
+
+/*
+=========================================================
+VELMORA CART PAGE
+=========================================================
+
+Primary Violet   #6C5CE7
+Soft Lavender    #B8A1FF
+Soft Rose        #F2B8C6
+Champagne        #EADBC8
+Warm Ivory       #FAF9F7
+White            #FFFFFF
+Charcoal         #2F3136
+Slate            #6B7280
+Success          #4F9D7A
+Error            #D95C5C
+=========================================================
+*/
 
 export default function CartPage() {
-
-  const [cart, setCart] = useState(getCart());
-
-  // Cart total based on current React state
-  const cartTotal = cart.reduce(
-    (total, item) =>
-      total + Number(item.price) * item.quantity,
-    0
+  const [
+    cart,
+    setCart,
+  ] = useState(
+    getCart()
   );
 
-  const totalItems = cart.reduce(
-    (total, item) => total + item.quantity,
-    0
-  );
+  /* =====================================================
+     TOTAL
+  ===================================================== */
 
+  const cartTotal =
+    cart.reduce(
+      (
+        total,
+        item
+      ) =>
+        total +
+        Number(
+          item.price || 0
+        ) *
+          Number(
+            item.quantity || 0
+          ),
 
-  function decreaseQuantity(item) {
+      0
+    );
 
-    addToCart(item, -1);
+  /* =====================================================
+     TOTAL ITEMS
+  ===================================================== */
 
-    setCart(getCart());
+  const totalItems =
+    cart.reduce(
+      (
+        total,
+        item
+      ) =>
+        total +
+        Number(
+          item.quantity || 0
+        ),
 
+      0
+    );
+
+  /* =====================================================
+     ORIGINAL TOTAL
+  ===================================================== */
+
+  const originalTotal =
+    cart.reduce(
+      (
+        total,
+        item
+      ) => {
+        const labelPrice =
+          Number(
+            item.labelPrice ||
+              item.price ||
+              0
+          );
+
+        return (
+          total +
+          labelPrice *
+            Number(
+              item.quantity ||
+                0
+            )
+        );
+      },
+
+      0
+    );
+
+  /* =====================================================
+     SAVINGS
+  ===================================================== */
+
+  const totalSavings =
+    Math.max(
+      0,
+      originalTotal -
+        cartTotal
+    );
+
+  /* =====================================================
+     DECREASE
+  ===================================================== */
+
+  function decreaseQuantity(
+    item
+  ) {
+    addToCart(
+      item,
+      -1
+    );
+
+    setCart(
+      getCart()
+    );
   }
 
+  /* =====================================================
+     INCREASE
+  ===================================================== */
 
-  function increaseQuantity(item) {
+  function increaseQuantity(
+    item
+  ) {
+    addToCart(
+      item,
+      1
+    );
 
-    addToCart(item, 1);
-
-    setCart(getCart());
-
+    setCart(
+      getCart()
+    );
   }
 
+  /* =====================================================
+     REMOVE
+  ===================================================== */
 
-  function handleRemove(productId) {
+  function handleRemove(
+    productId
+  ) {
+    removeFromCart(
+      productId
+    );
 
-    removeFromCart(productId);
-
-    setCart(getCart());
-
+    setCart(
+      getCart()
+    );
   }
 
+  /* =====================================================
+     PRICE FORMAT
+  ===================================================== */
+
+  function formatPrice(
+    value
+  ) {
+    return Number(
+      value || 0
+    ).toLocaleString(
+      "en-LK",
+      {
+        minimumFractionDigits:
+          2,
+
+        maximumFractionDigits:
+          2,
+      }
+    );
+  }
+
+  /* =====================================================
+     PAGE
+  ===================================================== */
 
   return (
-
     <main
       className="
-        w-full
+        relative
+
         min-h-screen
+        w-full
 
-        bg-[#F8F9FA]
+        overflow-hidden
 
-        pt-[88px]
-        md:pt-[96px]
+        bg-[#FAF9F7]
 
-        pb-10
-        sm:pb-14
+        pb-16
+        pt-[92px]
+
+        sm:pb-20
+
+        md:pt-[104px]
       "
     >
-
-      {/* ================= PAGE CONTAINER ================= */}
+      {/* =================================================
+          BACKGROUND AMBIENCE
+      ================================================= */}
 
       <div
         className="
-          w-full
-          max-w-[1200px]
+          pointer-events-none
+
+          absolute
+          -left-36
+          top-16
+
+          h-[420px]
+          w-[420px]
+
+          rounded-full
+
+          bg-[#B8A1FF]/[0.12]
+
+          blur-[120px]
+        "
+      />
+
+      <div
+        className="
+          pointer-events-none
+
+          absolute
+          -right-40
+          top-[500px]
+
+          h-[420px]
+          w-[420px]
+
+          rounded-full
+
+          bg-[#F2B8C6]/[0.11]
+
+          blur-[120px]
+        "
+      />
+
+      {/* =================================================
+          CONTAINER
+      ================================================= */}
+
+      <div
+        className="
+          relative
+          z-10
 
           mx-auto
+          w-full
+          max-w-[1220px]
 
           px-4
+
           sm:px-6
+
           lg:px-8
         "
       >
+        {/* =================================================
+            PAGE HEADER
+        ================================================= */}
 
-        {/* ================= PAGE HEADER ================= */}
-
-        <div
+        <section
           className="
-            mb-6
-            sm:mb-8
-
             flex
             flex-col
+            gap-5
+
+            border-b
+            border-[#ECE6F0]
+
+            pb-7
 
             sm:flex-row
             sm:items-end
             sm:justify-between
-
-            gap-3
+            sm:pb-9
           "
         >
-
           <div>
-
-            <p
+            <div
               className="
-                text-xs
-                font-bold
+                inline-flex
+                items-center
+                gap-2
 
+                rounded-full
+
+                border
+                border-[#DED4FF]
+
+                bg-[#F7F3FF]
+
+                px-3
+                py-1.5
+
+                text-[10px]
+                font-black
                 uppercase
                 tracking-[0.18em]
 
-                text-red-500
-
-                mb-2
+                text-[#6C5CE7]
               "
             >
-              Shopping Cart
-            </p>
+              <span
+                className="
+                  text-[#B9955B]
+                "
+              >
+                ✦
+              </span>
 
+              Velmora Bag
+            </div>
 
             <h1
               className="
+                mt-4
+
                 text-3xl
+                font-extrabold
+                tracking-[-0.045em]
+
+                text-[#2F3136]
+
                 sm:text-4xl
 
-                font-bold
-
-                tracking-tight
-
-                text-[#2F3542]
+                lg:text-[48px]
               "
             >
-              Your Cart
+              Your beauty
+              selection.
             </h1>
-
 
             <p
               className="
-                mt-2
+                mt-3
+
+                max-w-[620px]
 
                 text-sm
-                sm:text-base
+                leading-7
 
-                text-gray-500
+                text-[#77717C]
+
+                sm:text-base
               "
             >
-              Review your products before checkout.
+              Review the
+              Velmora
+              essentials
+              you've selected,
+              adjust quantities
+              and continue when
+              your ritual feels
+              complete.
             </p>
-
           </div>
 
+          {/* ITEM COUNT */}
 
-          {cart.length > 0 && (
-
+          {cart.length >
+            0 && (
             <div
               className="
                 inline-flex
                 self-start
-                sm:self-auto
-
                 items-center
-
-                gap-2
-
-                px-4
-                py-2
-
-                rounded-full
-
-                bg-white
-
-                border
-                border-gray-200
-
-                shadow-sm
-
-                text-sm
-                text-gray-600
-              "
-            >
-
-              <BsCart3
-                aria-hidden="true"
-                className="text-red-500"
-              />
-
-              {totalItems}{" "}
-              {totalItems === 1
-                ? "item"
-                : "items"}
-
-            </div>
-
-          )}
-
-        </div>
-
-
-
-        {/* ================= EMPTY CART ================= */}
-
-        {cart.length === 0 ? (
-
-          <section
-            className="
-              min-h-[420px]
-
-              bg-white
-
-              rounded-2xl
-              sm:rounded-3xl
-
-              border
-              border-gray-100
-
-              shadow-sm
-
-              px-6
-              py-12
-
-              flex
-              flex-col
-              items-center
-              justify-center
-
-              text-center
-            "
-          >
-
-            <div
-              className="
-                w-20
-                h-20
-
-                rounded-full
-
-                bg-red-50
-
-                flex
-                items-center
-                justify-center
-
-                mb-5
-              "
-            >
-
-              <BsCart3
-                aria-hidden="true"
-                className="
-                  text-3xl
-                  text-red-500
-                "
-              />
-
-            </div>
-
-
-            <h2
-              className="
-                text-2xl
-
-                font-bold
-
-                text-[#2F3542]
-              "
-            >
-              Your cart is empty
-            </h2>
-
-
-            <p
-              className="
-                mt-2
-
-                max-w-[420px]
-
-                text-sm
-                sm:text-base
-
-                text-gray-500
-
-                leading-relaxed
-              "
-            >
-              Looks like you haven't added any products
-              to your cart yet.
-            </p>
-
-
-            <Link
-              to="/products"
-
-              className="
-                mt-6
-
-                min-h-[48px]
-
-                px-6
-
-                rounded-xl
-
-                bg-red-500
-                text-white
-
-                font-semibold
-
-                flex
-                items-center
-                justify-center
-
-                shadow-sm
-
-                transition-all
-                duration-200
-
-                hover:bg-red-600
-                hover:shadow-md
-                hover:-translate-y-[1px]
-
-                active:scale-[0.98]
-
-                focus:outline-none
-                focus-visible:ring-2
-                focus-visible:ring-red-400
-                focus-visible:ring-offset-2
-              "
-            >
-              Browse Products
-            </Link>
-
-          </section>
-
-        ) : (
-
-          /* ================= CART LAYOUT ================= */
-
-          <div
-            className="
-              grid
-
-              grid-cols-1
-
-              lg:grid-cols-[minmax(0,1fr)_320px]
-
-              xl:grid-cols-[minmax(0,1fr)_350px]
-
-              gap-6
-              lg:gap-8
-
-              items-start
-            "
-          >
-
-            {/* ================= CART PRODUCTS ================= */}
-
-            <section
-              aria-label="Shopping cart products"
-
-              className="
-                flex
-                flex-col
-
-                gap-4
-              "
-            >
-
-              {cart.map((item) => (
-
-                <article
-                  key={item.productId}
-
-                  className="
-                    w-full
-
-                    bg-white
-
-                    rounded-2xl
-
-                    border
-                    border-gray-100
-
-                    shadow-sm
-
-                    overflow-hidden
-
-                    transition-all
-                    duration-200
-
-                    hover:shadow-md
-                    hover:border-gray-200
-                  "
-                >
-
-                  <div
-                    className="
-                      grid
-
-                      grid-cols-[100px_minmax(0,1fr)]
-
-                      sm:grid-cols-[130px_minmax(0,1fr)]
-
-                      md:grid-cols-[150px_minmax(0,1fr)]
-
-                      gap-3
-                      sm:gap-5
-
-                      p-3
-                      sm:p-4
-                    "
-                  >
-
-                    {/* ================= IMAGE ================= */}
-
-                    <Link
-                      to={`/overview/${item.productId}`}
-
-                      aria-label={`View ${item.name}`}
-                      className="
-                        w-full
-
-                        aspect-square
-
-                        rounded-xl
-
-                        bg-[#FAFAFA]
-
-                        overflow-hidden
-
-                        flex
-                        items-center
-                        justify-center
-
-                        focus:outline-none
-                        focus-visible:ring-2
-                        focus-visible:ring-red-400
-                      "
-                    >
-
-                      <img
-                        src={item.image}
-                        alt={item.name}
-
-                        loading="lazy"
-
-                        className="
-                          w-full
-                          h-full
-
-                          object-contain
-
-                          p-2
-
-                          transition-transform
-                          duration-300
-
-                          hover:scale-105
-                        "
-                      />
-
-                    </Link>
-
-
-
-                    {/* ================= DETAILS ================= */}
-
-                    <div
-                      className="
-                        min-w-0
-
-                        flex
-                        flex-col
-                      "
-                    >
-
-                      {/* Name + Remove */}
-
-                      <div
-                        className="
-                          flex
-                          items-start
-                          justify-between
-
-                          gap-2
-                        "
-                      >
-
-                        <div className="min-w-0">
-
-                          <Link
-                            to={`/overview/${item.productId}`}
-
-                            className="
-                              rounded
-
-                              focus:outline-none
-                              focus-visible:ring-2
-                              focus-visible:ring-red-400
-                            "
-                          >
-
-                            <h2
-                              className="
-                                text-base
-                                sm:text-lg
-
-                                font-bold
-
-                                text-[#2F3542]
-
-                                line-clamp-2
-
-                                hover:text-red-500
-
-                                transition-colors
-                              "
-                            >
-                              {item.name}
-                            </h2>
-
-                          </Link>
-
-
-                          <p
-                            className="
-                              mt-1
-
-                              text-[11px]
-                              sm:text-xs
-
-                              text-gray-400
-                            "
-                          >
-                            Product ID: {item.productId}
-                          </p>
-
-                        </div>
-
-
-                        {/* MOBILE DELETE */}
-
-                        <button
-                          type="button"
-
-                          onClick={() =>
-                            handleRemove(item.productId)
-                          }
-
-                          aria-label={`Remove ${item.name} from cart`}
-
-                          className="
-                            md:hidden
-
-                            shrink-0
-
-                            w-9
-                            h-9
-
-                            rounded-lg
-
-                            flex
-                            items-center
-                            justify-center
-
-                            bg-red-50
-                            text-red-500
-
-                            transition-all
-
-                            hover:bg-red-100
-
-                            active:scale-95
-
-                            focus:outline-none
-                            focus-visible:ring-2
-                            focus-visible:ring-red-400
-                          "
-                        >
-
-                          <FaTrash size={14} />
-
-                        </button>
-
-                      </div>
-
-
-
-                      {/* ================= PRICE ================= */}
-
-                      <div
-                        className="
-                          mt-3
-
-                          flex
-                          flex-wrap
-                          items-center
-
-                          gap-2
-                        "
-                      >
-
-                        <span
-                          className="
-                            text-lg
-                            sm:text-xl
-
-                            font-bold
-
-                            text-red-500
-                          "
-                        >
-                          Rs.{" "}
-                          {Number(item.price).toFixed(2)}
-                        </span>
-
-
-                        {Number(item.labelPrice) >
-                          Number(item.price) && (
-
-                          <span
-                            className="
-                              text-xs
-                              sm:text-sm
-
-                              text-gray-400
-
-                              line-through
-                            "
-                          >
-                            Rs.{" "}
-                            {Number(
-                              item.labelPrice
-                            ).toFixed(2)}
-                          </span>
-
-                        )}
-
-                      </div>
-
-
-
-                      {/* ================= BOTTOM CONTROLS ================= */}
-
-                      <div
-                        className="
-                          mt-auto
-                          pt-4
-
-                          flex
-                          flex-col
-
-                          sm:flex-row
-                          sm:items-center
-                          sm:justify-between
-
-                          gap-3
-                        "
-                      >
-
-                        {/* Quantity */}
-
-                        <div
-                          className="
-                            inline-flex
-                            self-start
-
-                            items-center
-
-                            rounded-xl
-
-                            border
-                            border-gray-200
-
-                            overflow-hidden
-
-                            bg-[#FAFAFA]
-                          "
-                        >
-
-                          <button
-                            type="button"
-
-                            onClick={() =>
-                              decreaseQuantity(item)
-                            }
-
-                            aria-label={`Decrease quantity of ${item.name}`}
-
-                            className="
-                              w-10
-                              h-10
-
-                              flex
-                              items-center
-                              justify-center
-
-                              text-lg
-                              font-bold
-
-                              text-gray-600
-
-                              transition-colors
-
-                              hover:bg-red-50
-                              hover:text-red-500
-
-                              active:bg-red-100
-
-                              focus:outline-none
-                              focus-visible:ring-2
-                              focus-visible:ring-inset
-                              focus-visible:ring-red-400
-                            "
-                          >
-                            −
-                          </button>
-
-
-                          <span
-                            className="
-                              min-w-[44px]
-                              h-10
-
-                              px-2
-
-                              flex
-                              items-center
-                              justify-center
-
-                              bg-white
-
-                              border-x
-                              border-gray-200
-
-                              text-sm
-                              font-bold
-
-                              text-[#2F3542]
-                            "
-                            aria-label={`Quantity ${item.quantity}`}
-                          >
-                            {item.quantity}
-                          </span>
-
-
-                          <button
-                            type="button"
-
-                            onClick={() =>
-                              increaseQuantity(item)
-                            }
-
-                            aria-label={`Increase quantity of ${item.name}`}
-
-                            className="
-                              w-10
-                              h-10
-
-                              flex
-                              items-center
-                              justify-center
-
-                              text-lg
-                              font-bold
-
-                              text-gray-600
-
-                              transition-colors
-
-                              hover:bg-red-50
-                              hover:text-red-500
-
-                              active:bg-red-100
-
-                              focus:outline-none
-                              focus-visible:ring-2
-                              focus-visible:ring-inset
-                              focus-visible:ring-red-400
-                            "
-                          >
-                            +
-                          </button>
-
-                        </div>
-
-
-
-                        {/* Item Total */}
-
-                        <div
-                          className="
-                            flex
-                            sm:flex-col
-
-                            items-center
-                            sm:items-end
-
-                            justify-between
-                            sm:justify-center
-
-                            gap-2
-                            sm:gap-0
-
-                            min-w-[120px]
-                          "
-                        >
-
-                          <span
-                            className="
-                              text-xs
-                              text-gray-400
-                            "
-                          >
-                            Item Total
-                          </span>
-
-
-                          <span
-                            className="
-                              text-base
-                              sm:text-lg
-
-                              font-bold
-
-                              text-[#2F3542]
-
-                              whitespace-nowrap
-                            "
-                          >
-                            Rs.{" "}
-                            {(
-                              Number(item.price) *
-                              item.quantity
-                            ).toFixed(2)}
-                          </span>
-
-                        </div>
-
-
-
-                        {/* DESKTOP DELETE */}
-
-                        <button
-                          type="button"
-
-                          onClick={() =>
-                            handleRemove(item.productId)
-                          }
-
-                          aria-label={`Remove ${item.name} from cart`}
-
-                          className="
-                            hidden
-                            md:flex
-
-                            shrink-0
-
-                            w-10
-                            h-10
-
-                            items-center
-                            justify-center
-
-                            rounded-xl
-
-                            bg-white
-
-                            border
-                            border-gray-200
-
-                            text-red-500
-
-                            transition-all
-                            duration-200
-
-                            hover:bg-red-50
-                            hover:border-red-200
-                            hover:text-red-600
-
-                            active:scale-95
-
-                            focus:outline-none
-                            focus-visible:ring-2
-                            focus-visible:ring-red-400
-                            focus-visible:ring-offset-2
-                          "
-                        >
-
-                          <FaTrash size={15} />
-
-                        </button>
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                </article>
-
-              ))}
-
-            </section>
-
-
-
-            {/* ================= ORDER SUMMARY ================= */}
-
-            <aside
-              aria-label="Order summary"
-
-              className="
-                w-full
-
-                lg:sticky
-                lg:top-[104px]
-
-                bg-white
+                gap-2.5
 
                 rounded-2xl
 
                 border
-                border-gray-100
+                border-[#E4DDF0]
+
+                bg-white/80
+
+                px-4
+                py-3
+
+                text-sm
+                font-semibold
+
+                text-[#625C69]
 
                 shadow-sm
 
-                p-5
-                sm:p-6
+                backdrop-blur-xl
+
+                sm:self-auto
               "
             >
-
-              <h2
-                className="
-                  text-xl
-
-                  font-bold
-
-                  text-[#2F3542]
-                "
-              >
-                Order Summary
-              </h2>
-
-
-              <p
-                className="
-                  mt-1
-
-                  text-sm
-
-                  text-gray-500
-                "
-              >
-                Review your cart total before checkout.
-              </p>
-
-
-              <div
-                className="
-                  w-full
-                  h-px
-
-                  bg-gray-100
-
-                  my-5
-                "
-              />
-
-
-              {/* Items */}
-
               <div
                 className="
                   flex
+                  h-9
+                  w-9
                   items-center
-                  justify-between
+                  justify-center
 
-                  gap-4
+                  rounded-xl
 
-                  text-sm
+                  bg-[#F1ECFF]
 
-                  mb-3
+                  text-[#6C5CE7]
                 "
               >
-
-                <span className="text-gray-500">
-                  Items
-                </span>
-
-                <span
-                  className="
-                    font-semibold
-                    text-[#2F3542]
-                  "
-                >
-                  {totalItems}
-                </span>
-
+                <BsCart3 />
               </div>
 
-
-              {/* Subtotal */}
-
-              <div
-                className="
-                  flex
-                  items-center
-                  justify-between
-
-                  gap-4
-
-                  text-sm
-                "
-              >
-
-                <span className="text-gray-500">
-                  Subtotal
-                </span>
-
-                <span
+              <div>
+                <p
                   className="
-                    font-semibold
-                    text-[#2F3542]
+                    text-[9px]
+                    font-black
+                    uppercase
+                    tracking-[0.12em]
 
-                    whitespace-nowrap
+                    text-[#9C95A0]
                   "
                 >
-                  Rs. {cartTotal.toFixed(2)}
-                </span>
+                  Your Bag
+                </p>
 
-              </div>
-
-
-              <div
-                className="
-                  w-full
-                  h-px
-
-                  bg-gray-100
-
-                  my-5
-                "
-              />
-
-
-              {/* Final Total */}
-
-              <div
-                className="
-                  flex
-                  items-end
-                  justify-between
-
-                  gap-4
-                "
-              >
-
-                <div>
-
-                  <p
-                    className="
-                      text-sm
-                      text-gray-500
-                    "
-                  >
-                    Total
-                  </p>
-
-                  <p
-                    className="
-                      mt-1
-
-                      text-[11px]
-
-                      text-gray-400
-                    "
-                  >
-                    Final amount before payment
-                  </p>
-
-                </div>
-
-
-                <span
+                <p
                   className="
-                    text-2xl
+                    mt-0.5
 
+                    text-sm
                     font-bold
 
-                    text-red-500
-
-                    whitespace-nowrap
+                    text-[#413B46]
                   "
                 >
-                  Rs. {cartTotal.toFixed(2)}
-                </span>
-
+                  {
+                    totalItems
+                  }{" "}
+                  {totalItems ===
+                  1
+                    ? "item"
+                    : "items"}
+                </p>
               </div>
+            </div>
+          )}
+        </section>
 
+        {/* =================================================
+            EMPTY CART
+        ================================================= */}
 
-              {/* Checkout */}
+        {cart.length ===
+        0 ? (
+          <section
+            className="
+              relative
 
-              <Link
-                to="/checkout"
+              mt-8
 
-                state={{
-                  cart: cart,
-                }}
+              flex
+              min-h-[500px]
+              flex-col
+              items-center
+              justify-center
 
+              overflow-hidden
+
+              rounded-[30px]
+
+              border
+              border-[#EAE3F2]
+
+              bg-white
+
+              px-5
+              py-14
+
+              text-center
+
+              shadow-[0_22px_70px_rgba(59,44,80,0.055)]
+
+              sm:px-8
+            "
+          >
+            {/* GLOW */}
+
+            <div
+              className="
+                pointer-events-none
+
+                absolute
+                -right-24
+                -top-24
+
+                h-64
+                w-64
+
+                rounded-full
+
+                bg-[#B8A1FF]/[0.14]
+
+                blur-[80px]
+              "
+            />
+
+            <div
+              className="
+                pointer-events-none
+
+                absolute
+                -bottom-28
+                -left-20
+
+                h-64
+                w-64
+
+                rounded-full
+
+                bg-[#F2B8C6]/[0.12]
+
+                blur-[80px]
+              "
+            />
+
+            {/* ICON */}
+
+            <div
+              className="
+                relative
+
+                flex
+                h-20
+                w-20
+                items-center
+                justify-center
+
+                rounded-[24px]
+
+                bg-gradient-to-br
+                from-[#F0EBFF]
+                to-[#FFF0F4]
+
+                text-3xl
+                text-[#6C5CE7]
+
+                shadow-[0_14px_32px_rgba(108,92,231,0.13)]
+              "
+            >
+              <BsCart3 />
+            </div>
+
+            <p
+              className="
+                relative
+
+                mt-6
+
+                text-[10px]
+                font-black
+                uppercase
+                tracking-[0.2em]
+
+                text-[#9A79E8]
+              "
+            >
+              Velmora
+              Collection
+            </p>
+
+            <h2
+              className="
+                relative
+
+                mt-2
+
+                text-2xl
+                font-extrabold
+                tracking-[-0.03em]
+
+                text-[#302B34]
+
+                sm:text-3xl
+              "
+            >
+              Your bag is
+              waiting.
+            </h2>
+
+            <p
+              className="
+                relative
+
+                mx-auto
+                mt-3
+
+                max-w-[480px]
+
+                text-sm
+                leading-7
+
+                text-[#7D7681]
+
+                sm:text-base
+              "
+            >
+              Explore our
+              curated beauty
+              collection and
+              add something
+              special to your
+              everyday ritual.
+            </p>
+
+            <Link
+              to="/products"
+              className="
+                group
+                relative
+
+                mt-7
+
+                inline-flex
+                min-h-[52px]
+                items-center
+                justify-center
+                gap-2
+
+                rounded-2xl
+
+                bg-gradient-to-r
+                from-[#6C5CE7]
+                to-[#8873E7]
+
+                px-7
+
+                text-sm
+                font-bold
+                text-white
+
+                shadow-[0_12px_28px_rgba(108,92,231,0.22)]
+
+                transition-all
+                duration-300
+
+                hover:-translate-y-1
+                hover:shadow-[0_18px_36px_rgba(108,92,231,0.30)]
+
+                active:scale-[0.98]
+              "
+            >
+              Explore
+              Collection
+
+              <FiArrowRight
                 className="
-                  mt-6
+                  transition-transform
+                  duration-300
 
-                  w-full
-                  min-h-[52px]
+                  group-hover:translate-x-1
+                "
+              />
+            </Link>
+          </section>
+        ) : (
+          /* ===============================================
+             CART LAYOUT
+          =============================================== */
 
-                  rounded-xl
+          <div
+            className="
+              mt-7
 
-                  bg-red-500
-                  text-white
+              grid
+              grid-cols-1
+              items-start
+              gap-6
 
-                  flex
-                  items-center
-                  justify-center
+              lg:grid-cols-[minmax(0,1fr)_340px]
 
-                  font-bold
+              xl:grid-cols-[minmax(0,1fr)_370px]
+              xl:gap-8
+            "
+          >
+            {/* =============================================
+                CART PRODUCTS
+            ============================================= */}
 
-                  shadow-sm
+            <section
+              aria-label="Velmora shopping bag products"
+              className="
+                flex
+                min-w-0
+                flex-col
+                gap-4
+              "
+            >
+              {cart.map(
+                (item) => {
+                  const image =
+                    item.image ||
+                    item.images?.[0];
 
-                  transition-all
-                  duration-200
+                  const itemName =
+                    item.name ||
+                    item.productName ||
+                    "Velmora Product";
 
-                  hover:bg-red-600
-                  hover:shadow-md
-                  hover:-translate-y-[1px]
+                  const hasDiscount =
+                    Number(
+                      item.labelPrice
+                    ) >
+                    Number(
+                      item.price
+                    );
 
-                  active:scale-[0.98]
+                  const itemTotal =
+                    Number(
+                      item.price ||
+                        0
+                    ) *
+                    Number(
+                      item.quantity ||
+                        0
+                    );
 
-                  focus:outline-none
-                  focus-visible:ring-2
-                  focus-visible:ring-red-400
-                  focus-visible:ring-offset-2
+                  const discountPercentage =
+                    hasDiscount &&
+                    Number(
+                      item.labelPrice
+                    ) > 0
+                      ? Math.round(
+                          ((Number(
+                            item.labelPrice
+                          ) -
+                            Number(
+                              item.price
+                            )) /
+                            Number(
+                              item.labelPrice
+                            )) *
+                            100
+                        )
+                      : 0;
+
+                  return (
+                    <article
+                      key={
+                        item.productId
+                      }
+                      className="
+                        group
+
+                        relative
+
+                        overflow-hidden
+
+                        rounded-[24px]
+
+                        border
+                        border-[#EAE4EF]
+
+                        bg-white
+
+                        p-4
+
+                        shadow-[0_10px_35px_rgba(58,44,77,0.045)]
+
+                        transition-all
+                        duration-300
+
+                        hover:border-[#D8CDF4]
+                        hover:shadow-[0_18px_48px_rgba(70,52,98,0.075)]
+
+                        sm:p-5
+                      "
+                    >
+                      <div
+                        className="
+                          grid
+                          grid-cols-[96px_minmax(0,1fr)]
+                          gap-4
+
+                          sm:grid-cols-[135px_minmax(0,1fr)]
+                          sm:gap-5
+
+                          md:grid-cols-[155px_minmax(0,1fr)]
+                        "
+                      >
+                        {/* =================================
+                            IMAGE
+                        ================================= */}
+
+                        <Link
+                          to={`/overview/${item.productId}`}
+                          aria-label={`View ${itemName}`}
+                          className="
+                            relative
+
+                            aspect-square
+                            w-full
+
+                            overflow-hidden
+
+                            rounded-[18px]
+
+                            border
+                            border-[#EEE9F4]
+
+                            bg-gradient-to-br
+                            from-[#FBF9FF]
+                            to-[#FFF5F8]
+
+                            focus:outline-none
+                            focus-visible:ring-2
+                            focus-visible:ring-[#B8A1FF]
+                          "
+                        >
+                          {image ? (
+                            <img
+                              src={
+                                image
+                              }
+                              alt={
+                                itemName
+                              }
+                              loading="lazy"
+                              className="
+                                h-full
+                                w-full
+
+                                object-contain
+
+                                p-2
+
+                                transition-transform
+                                duration-500
+
+                                group-hover:scale-[1.04]
+                              "
+                            />
+                          ) : (
+                            <div
+                              className="
+                                flex
+                                h-full
+                                w-full
+                                items-center
+                                justify-center
+
+                                text-2xl
+                                text-[#9A83E4]
+                              "
+                            >
+                              <FiPackage />
+                            </div>
+                          )}
+
+                          {/* BRAND */}
+
+                          <span
+                            className="
+                              absolute
+                              bottom-2
+                              left-2
+
+                              rounded-full
+
+                              bg-white/90
+
+                              px-2
+                              py-1
+
+                              text-[8px]
+                              font-black
+                              uppercase
+                              tracking-[0.1em]
+
+                              text-[#6C5CE7]
+
+                              shadow-sm
+
+                              backdrop-blur-md
+                            "
+                          >
+                            Velmora
+                          </span>
+
+                          {/* DISCOUNT */}
+
+                          {hasDiscount && (
+                            <span
+                              className="
+                                absolute
+                                right-2
+                                top-2
+
+                                rounded-full
+
+                                bg-[#FFF0F4]
+
+                                px-2
+                                py-1
+
+                                text-[8px]
+                                font-black
+
+                                text-[#B66178]
+                              "
+                            >
+                              -
+                              {
+                                discountPercentage
+                              }
+                              %
+                            </span>
+                          )}
+                        </Link>
+
+                        {/* =================================
+                            DETAILS
+                        ================================= */}
+
+                        <div
+                          className="
+                            min-w-0
+                          "
+                        >
+                          {/* NAME + MOBILE REMOVE */}
+
+                          <div
+                            className="
+                              flex
+                              items-start
+                              justify-between
+                              gap-2
+                            "
+                          >
+                            <div className="min-w-0">
+                              <p
+                                className="
+                                  text-[8px]
+                                  font-black
+                                  uppercase
+                                  tracking-[0.14em]
+
+                                  text-[#A49DA8]
+                                "
+                              >
+                                Ref.{" "}
+                                {
+                                  item.productId
+                                }
+                              </p>
+
+                              <Link
+                                to={`/overview/${item.productId}`}
+                                className="
+                                  block
+
+                                  focus:outline-none
+                                  focus-visible:ring-2
+                                  focus-visible:ring-[#B8A1FF]
+                                "
+                              >
+                                <h2
+                                  className="
+                                    mt-1
+
+                                    break-words
+
+                                    text-base
+                                    font-extrabold
+                                    leading-6
+
+                                    text-[#38323C]
+
+                                    transition-colors
+
+                                    hover:text-[#6C5CE7]
+
+                                    sm:text-lg
+                                  "
+                                >
+                                  {
+                                    itemName
+                                  }
+                                </h2>
+                              </Link>
+                            </div>
+
+                            {/* MOBILE DELETE */}
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleRemove(
+                                  item.productId
+                                )
+                              }
+                              aria-label={`Remove ${itemName} from cart`}
+                              className="
+                                flex
+                                h-9
+                                w-9
+                                shrink-0
+                                items-center
+                                justify-center
+
+                                rounded-xl
+
+                                border
+                                border-[#F0D7DC]
+
+                                bg-[#FFF5F7]
+
+                                text-[#B45462]
+
+                                transition-all
+
+                                hover:bg-[#FCECEF]
+
+                                active:scale-90
+
+                                md:hidden
+                              "
+                            >
+                              <FaTrash
+                                size={
+                                  13
+                                }
+                              />
+                            </button>
+                          </div>
+
+                          {/* PRICE */}
+
+                          <div
+                            className="
+                              mt-3
+
+                              flex
+                              flex-wrap
+                              items-center
+                              gap-2
+                            "
+                          >
+                            <span
+                              className="
+                                text-lg
+                                font-extrabold
+                                tracking-[-0.02em]
+
+                                text-[#6C5CE7]
+
+                                sm:text-xl
+                              "
+                            >
+                              Rs.{" "}
+                              {formatPrice(
+                                item.price
+                              )}
+                            </span>
+
+                            {hasDiscount && (
+                              <span
+                                className="
+                                  text-xs
+                                  text-[#A8A1AD]
+                                  line-through
+
+                                  sm:text-sm
+                                "
+                              >
+                                Rs.{" "}
+                                {formatPrice(
+                                  item.labelPrice
+                                )}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* =================================
+                              BOTTOM CONTROLS
+                          ================================= */}
+
+                          <div
+                            className="
+                              mt-5
+
+                              flex
+                              flex-col
+                              gap-4
+
+                              sm:flex-row
+                              sm:items-end
+                              sm:justify-between
+                            "
+                          >
+                            {/* QUANTITY */}
+
+                            <div>
+                              <p
+                                className="
+                                  mb-1.5
+
+                                  text-[10px]
+                                  font-semibold
+
+                                  text-[#97909B]
+                                "
+                              >
+                                Quantity
+                              </p>
+
+                              <div
+                                className="
+                                  inline-flex
+                                  items-center
+
+                                  overflow-hidden
+
+                                  rounded-xl
+
+                                  border
+                                  border-[#E2DCE8]
+
+                                  bg-[#FBFAFC]
+                                "
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    decreaseQuantity(
+                                      item
+                                    )
+                                  }
+                                  aria-label={`Decrease quantity of ${itemName}`}
+                                  className="
+                                    flex
+                                    h-10
+                                    w-10
+                                    items-center
+                                    justify-center
+
+                                    text-lg
+                                    font-bold
+                                    text-[#5D5661]
+
+                                    transition-colors
+
+                                    hover:bg-[#F0EBFF]
+                                    hover:text-[#6C5CE7]
+
+                                    active:bg-[#E9E1FF]
+                                  "
+                                >
+                                  −
+                                </button>
+
+                                <span
+                                  aria-label={`Quantity ${item.quantity}`}
+                                  className="
+                                    flex
+                                    h-10
+                                    min-w-[44px]
+                                    items-center
+                                    justify-center
+
+                                    border-x
+                                    border-[#E2DCE8]
+
+                                    bg-white
+
+                                    px-2
+
+                                    text-sm
+                                    font-bold
+                                    text-[#39343D]
+                                  "
+                                >
+                                  {
+                                    item.quantity
+                                  }
+                                </span>
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    increaseQuantity(
+                                      item
+                                    )
+                                  }
+                                  aria-label={`Increase quantity of ${itemName}`}
+                                  className="
+                                    flex
+                                    h-10
+                                    w-10
+                                    items-center
+                                    justify-center
+
+                                    text-lg
+                                    font-bold
+                                    text-[#5D5661]
+
+                                    transition-colors
+
+                                    hover:bg-[#F0EBFF]
+                                    hover:text-[#6C5CE7]
+
+                                    active:bg-[#E9E1FF]
+                                  "
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* ITEM TOTAL */}
+
+                            <div
+                              className="
+                                flex
+                                items-center
+                                justify-between
+                                gap-3
+
+                                sm:block
+                                sm:text-right
+                              "
+                            >
+                              <span
+                                className="
+                                  text-[10px]
+                                  font-semibold
+
+                                  text-[#9E97A2]
+                                "
+                              >
+                                Item Total
+                              </span>
+
+                              <p
+                                className="
+                                  mt-1
+
+                                  whitespace-nowrap
+
+                                  text-base
+                                  font-extrabold
+
+                                  text-[#37323B]
+
+                                  sm:text-lg
+                                "
+                              >
+                                Rs.{" "}
+                                {formatPrice(
+                                  itemTotal
+                                )}
+                              </p>
+                            </div>
+
+                            {/* DESKTOP REMOVE */}
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleRemove(
+                                  item.productId
+                                )
+                              }
+                              aria-label={`Remove ${itemName} from cart`}
+                              className="
+                                hidden
+                                h-10
+                                w-10
+                                shrink-0
+                                items-center
+                                justify-center
+
+                                rounded-xl
+
+                                border
+                                border-[#F0D7DC]
+
+                                bg-white
+
+                                text-[#B45462]
+
+                                transition-all
+                                duration-200
+
+                                hover:border-[#E4BBC4]
+                                hover:bg-[#FFF2F5]
+
+                                active:scale-90
+
+                                md:flex
+                              "
+                            >
+                              <FaTrash
+                                size={
+                                  14
+                                }
+                              />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                }
+              )}
+
+              {/* =========================================
+                  BENEFITS
+              ========================================= */}
+
+              <div
+                className="
+                  grid
+                  grid-cols-1
+                  gap-3
+
+                  sm:grid-cols-3
                 "
               >
-                Proceed to Checkout
-              </Link>
+                <BenefitCard
+                  icon={
+                    <FiStar />
+                  }
+                  title="Curated"
+                  text="Selected beauty essentials."
+                />
 
+                <BenefitCard
+                  icon={
+                    <FiShield />
+                  }
+                  title="Your Account"
+                  text="Continue through signed-in checkout."
+                />
 
-              {/* Continue Shopping */}
+                <BenefitCard
+                  icon={
+                    <FiCheck />
+                  }
+                  title="Flexible"
+                  text="Adjust your bag before ordering."
+                />
+              </div>
+            </section>
 
-              <Link
-                to="/products"
+            {/* =============================================
+                ORDER SUMMARY
+            ============================================= */}
 
+            <aside
+              aria-label="Order summary"
+              className="
+                relative
+
+                overflow-hidden
+
+                rounded-[26px]
+
+                border
+                border-[#E8E1F0]
+
+                bg-white
+
+                p-5
+
+                shadow-[0_18px_55px_rgba(61,45,84,0.07)]
+
+                sm:p-6
+
+                lg:sticky
+                lg:top-[104px]
+              "
+            >
+              {/* GLOW */}
+
+              <div
                 className="
-                  mt-3
+                  pointer-events-none
 
-                  w-full
-                  min-h-[46px]
+                  absolute
+                  -right-20
+                  -top-20
 
-                  rounded-xl
+                  h-52
+                  w-52
 
-                  flex
-                  items-center
-                  justify-center
+                  rounded-full
 
-                  border
-                  border-gray-200
+                  bg-[#B8A1FF]/[0.14]
 
-                  bg-white
-
-                  text-sm
-                  font-semibold
-
-                  text-gray-600
-
-                  transition-all
-
-                  hover:bg-gray-50
-                  hover:text-[#2F3542]
-
-                  focus:outline-none
-                  focus-visible:ring-2
-                  focus-visible:ring-gray-400
+                  blur-[70px]
                 "
-              >
-                Continue Shopping
-              </Link>
+              />
 
+              <div className="relative">
+                {/* TITLE */}
+
+                <div
+                  className="
+                    flex
+                    items-start
+                    justify-between
+                    gap-4
+                  "
+                >
+                  <div>
+                    <p
+                      className="
+                        text-[9px]
+                        font-black
+                        uppercase
+                        tracking-[0.18em]
+
+                        text-[#9A79E8]
+                      "
+                    >
+                      Your Selection
+                    </p>
+
+                    <h2
+                      className="
+                        mt-1
+
+                        text-xl
+                        font-extrabold
+                        text-[#302B34]
+
+                        sm:text-2xl
+                      "
+                    >
+                      Bag Summary
+                    </h2>
+                  </div>
+
+                  <div
+                    className="
+                      flex
+                      h-10
+                      w-10
+                      shrink-0
+                      items-center
+                      justify-center
+
+                      rounded-xl
+
+                      bg-[#F1ECFF]
+
+                      text-[#6C5CE7]
+                    "
+                  >
+                    <FiShoppingBag />
+                  </div>
+                </div>
+
+                <p
+                  className="
+                    mt-2
+
+                    text-sm
+                    leading-6
+                    text-[#807985]
+                  "
+                >
+                  Review your
+                  Velmora bag
+                  before
+                  continuing to
+                  delivery.
+                </p>
+
+                {/* DIVIDER */}
+
+                <div
+                  className="
+                    my-5
+                    h-px
+                    bg-[#EEE9F2]
+                  "
+                />
+
+                {/* ITEMS */}
+
+                <SummaryRow
+                  label="Items"
+                  value={
+                    totalItems
+                  }
+                />
+
+                {/* ORIGINAL TOTAL */}
+
+                {totalSavings >
+                  0 && (
+                  <div className="mt-3">
+                    <SummaryRow
+                      label="Original value"
+                      value={`Rs. ${formatPrice(
+                        originalTotal
+                      )}`}
+                      muted
+                    />
+                  </div>
+                )}
+
+                {/* SUBTOTAL */}
+
+                <div className="mt-3">
+                  <SummaryRow
+                    label="Subtotal"
+                    value={`Rs. ${formatPrice(
+                      cartTotal
+                    )}`}
+                  />
+                </div>
+
+                {/* SAVINGS */}
+
+                {totalSavings >
+                  0 && (
+                  <div
+                    className="
+                      mt-5
+
+                      flex
+                      items-center
+                      justify-between
+                      gap-4
+
+                      rounded-2xl
+
+                      border
+                      border-[#DDEEE5]
+
+                      bg-[#F1F8F4]
+
+                      px-4
+                      py-3
+                    "
+                  >
+                    <span
+                      className="
+                        text-xs
+                        font-bold
+                        text-[#438164]
+                      "
+                    >
+                      Your savings
+                    </span>
+
+                    <span
+                      className="
+                        text-sm
+                        font-extrabold
+                        text-[#438164]
+                      "
+                    >
+                      Rs.{" "}
+                      {formatPrice(
+                        totalSavings
+                      )}
+                    </span>
+                  </div>
+                )}
+
+                {/* TOTAL */}
+
+                <div
+                  className="
+                    my-5
+                    h-px
+                    bg-[#EEE9F2]
+                  "
+                />
+
+                <div
+                  className="
+                    flex
+                    items-end
+                    justify-between
+                    gap-4
+                  "
+                >
+                  <div>
+                    <p
+                      className="
+                        text-sm
+                        font-bold
+                        text-[#4B454F]
+                      "
+                    >
+                      Total
+                    </p>
+
+                    <p
+                      className="
+                        mt-1
+
+                        text-[10px]
+                        text-[#9A939F]
+                      "
+                    >
+                      Before
+                      placing your
+                      order
+                    </p>
+                  </div>
+
+                  <span
+                    className="
+                      whitespace-nowrap
+
+                      text-2xl
+                      font-extrabold
+                      tracking-[-0.03em]
+
+                      text-[#6C5CE7]
+                    "
+                  >
+                    Rs.{" "}
+                    {formatPrice(
+                      cartTotal
+                    )}
+                  </span>
+                </div>
+
+                {/* =========================================
+                    CHECKOUT CTA
+                ========================================= */}
+
+                <Link
+                  to="/checkout"
+                  state={{
+                    cart:
+                      cart,
+                  }}
+                  className="
+                    group
+
+                    mt-6
+
+                    flex
+                    min-h-[54px]
+                    w-full
+                    items-center
+                    justify-center
+                    gap-2
+
+                    rounded-2xl
+
+                    bg-gradient-to-r
+                    from-[#6C5CE7]
+                    to-[#8873E7]
+
+                    px-4
+
+                    text-sm
+                    font-bold
+                    text-white
+
+                    shadow-[0_12px_28px_rgba(108,92,231,0.22)]
+
+                    transition-all
+                    duration-300
+
+                    hover:-translate-y-0.5
+                    hover:shadow-[0_18px_36px_rgba(108,92,231,0.30)]
+
+                    active:scale-[0.98]
+                  "
+                >
+                  Continue to
+                  Checkout
+
+                  <FiArrowRight
+                    className="
+                      transition-transform
+                      duration-300
+
+                      group-hover:translate-x-1
+                    "
+                  />
+                </Link>
+
+                {/* CONTINUE SHOPPING */}
+
+                <Link
+                  to="/products"
+                  className="
+                    mt-3
+
+                    flex
+                    min-h-[48px]
+                    w-full
+                    items-center
+                    justify-center
+
+                    rounded-2xl
+
+                    border
+                    border-[#E1DAE8]
+
+                    bg-white
+
+                    text-sm
+                    font-bold
+                    text-[#68616D]
+
+                    transition-all
+                    duration-200
+
+                    hover:border-[#CABDF1]
+                    hover:bg-[#F8F4FF]
+                    hover:text-[#6C5CE7]
+                  "
+                >
+                  Continue
+                  Exploring
+                </Link>
+
+                {/* =========================================
+                    VELMORA NOTE
+                ========================================= */}
+
+                <div
+                  className="
+                    mt-5
+
+                    overflow-hidden
+
+                    rounded-2xl
+
+                    bg-[#302C3C]
+
+                    p-4
+
+                    text-white
+                  "
+                >
+                  <div
+                    className="
+                      flex
+                      items-start
+                      gap-3
+                    "
+                  >
+                    <div
+                      className="
+                        flex
+                        h-9
+                        w-9
+                        shrink-0
+                        items-center
+                        justify-center
+
+                        rounded-xl
+
+                        bg-white/[0.08]
+
+                        text-[#D0C2FF]
+                      "
+                    >
+                      ✦
+                    </div>
+
+                    <div>
+                      <p
+                        className="
+                          text-xs
+                          font-bold
+                        "
+                      >
+                        The Velmora
+                        Ritual
+                      </p>
+
+                      <p
+                        className="
+                          mt-1
+
+                          text-[11px]
+                          leading-5
+
+                          text-white/60
+                        "
+                      >
+                        Review,
+                        refine and
+                        continue
+                        when your
+                        beauty
+                        selection
+                        feels right.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </aside>
-
           </div>
-
         )}
+      </div>
+    </main>
+  );
+}
 
+/* =========================================================
+   SUMMARY ROW
+========================================================= */
+
+function SummaryRow({
+  label,
+  value,
+  muted = false,
+}) {
+  return (
+    <div
+      className="
+        flex
+        items-center
+        justify-between
+        gap-4
+      "
+    >
+      <span
+        className="
+          text-sm
+          text-[#827B86]
+        "
+      >
+        {label}
+      </span>
+
+      <span
+        className={`
+          whitespace-nowrap
+
+          text-sm
+          font-bold
+
+          ${
+            muted
+              ? "text-[#AAA3AE] line-through"
+              : "text-[#403A44]"
+          }
+        `}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+
+/* =========================================================
+   BENEFIT CARD
+========================================================= */
+
+function BenefitCard({
+  icon,
+  title,
+  text,
+}) {
+  return (
+    <div
+      className="
+        flex
+        items-start
+        gap-3
+
+        rounded-2xl
+
+        border
+        border-[#EAE4F0]
+
+        bg-white/75
+
+        p-4
+      "
+    >
+      <div
+        className="
+          flex
+          h-9
+          w-9
+          shrink-0
+          items-center
+          justify-center
+
+          rounded-xl
+
+          bg-[#F1ECFF]
+
+          text-[#6C5CE7]
+        "
+      >
+        {icon}
       </div>
 
-    </main>
+      <div>
+        <p
+          className="
+            text-xs
+            font-bold
+            text-[#47414B]
+          "
+        >
+          {title}
+        </p>
 
+        <p
+          className="
+            mt-1
+
+            text-[11px]
+            leading-5
+
+            text-[#918A96]
+          "
+        >
+          {text}
+        </p>
+      </div>
+    </div>
   );
-
 }

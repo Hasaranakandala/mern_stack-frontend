@@ -46,6 +46,22 @@ import {
    STAR DISPLAY
 ========================================================= */
 
+function handleBuyNow() {
+  if (!available) {
+    toast.error("This product is currently unavailable");
+    return;
+  }
+
+  // Add selected product to cart
+  addToCart(product, 1);
+
+  // Navigate to cart page
+  navigate("/cart");
+}
+
+
+
+
 function Stars({
   rating = 0,
   size = "text-sm",

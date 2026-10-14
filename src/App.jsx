@@ -19,6 +19,8 @@ import RegisterPage from "./pages/rejister";
 import ForgetPassword from "./pages/forgetPassword"
 import About from "./pages/about";
 import Contact from "./pages/contact";
+import MyProfile from "./pages/client/myProfile";
+import MyOrders from "./pages/client/myOrders";
 
 
 
@@ -61,6 +63,15 @@ function App() {
           path="/about"
           element={<About />}
         />
+        <Route
+  path="/profile"
+  element={<MyProfile />}
+/>
+
+<Route
+  path="/orders"
+  element={<MyOrders />}
+/>
     
         <Route
           path="/contacts"

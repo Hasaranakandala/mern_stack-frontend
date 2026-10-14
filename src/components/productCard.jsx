@@ -1,9 +1,4 @@
-import {
-  Link,
-  useNavigate,
-} from "react-router-dom";
-
-import { BsCart3 } from "react-icons/bs";
+import { useNavigate, Link } from "react-router-dom";
 
 /*
 =========================================================
@@ -69,32 +64,6 @@ export default function ProductCard({
     Number(
       product.stock
     ) > 0;
-
-  /* =====================================================
-     ADD TO CART
-  ===================================================== */
-
-  function handleAddToCart() {
-    if (!isAvailable) {
-      return;
-    }
-
-    console.log(
-      "Add to cart:",
-      product
-    );
-
-    /*
-      Add your existing cart logic here.
-
-      Example:
-
-      addToCart(product, 1);
-      toast.success(
-        `${product.productName} added to your Velmora bag`
-      );
-    */
-  }
 
   /* =====================================================
      BUY NOW
@@ -800,80 +769,9 @@ export default function ProductCard({
             grid-cols-1
             gap-2.5
             pt-5
-
-            min-[430px]:grid-cols-2
           "
         >
-          {/* ADD TO CART */}
-
-          <button
-            type="button"
-            disabled={
-              !isAvailable
-            }
-            onClick={
-              handleAddToCart
-            }
-            aria-label={`Add ${product.productName} to cart`}
-            className="
-              flex
-              min-h-[48px]
-              w-full
-              items-center
-              justify-center
-              gap-2
-
-              rounded-xl
-
-              bg-gradient-to-r
-              from-[#6C5CE7]
-              to-[#8E7AF0]
-
-              px-3
-
-              text-xs
-              font-bold
-
-              text-white
-
-              shadow-[0_9px_22px_rgba(108,92,231,0.20)]
-
-              transition-all
-              duration-300
-
-              hover:-translate-y-0.5
-              hover:shadow-[0_13px_28px_rgba(108,92,231,0.28)]
-
-              active:scale-[0.98]
-
-              focus:outline-none
-              focus-visible:ring-2
-              focus-visible:ring-[#B8A1FF]
-              focus-visible:ring-offset-2
-
-              disabled:cursor-not-allowed
-              disabled:bg-none
-              disabled:bg-[#DDD9E4]
-              disabled:text-[#9C97A2]
-              disabled:shadow-none
-              disabled:hover:translate-y-0
-
-              sm:text-sm
-            "
-          >
-            <BsCart3
-              className="
-                text-base
-              "
-              aria-hidden="true"
-            />
-
-            {isAvailable
-              ? "Add to Bag"
-              : "Unavailable"}
-          </button>
-
-          {/* BUY NOW */}
+          {/* VIEW PRODUCT */}
 
           {isAvailable && (
             <button
